@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
             <header className="w-full">
                 <Navbar />
             </header>
-            <main className="w-full">
+            <main className="w-full flex-grow">
                 {children}
             </main>
             <footer className="w-full">
