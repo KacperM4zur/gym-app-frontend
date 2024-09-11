@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import LayoutDefaultUser from "../components/LayoutDefaultUser.jsx";
+import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
 
 const faqData = [
     {

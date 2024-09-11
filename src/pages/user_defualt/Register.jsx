@@ -1,4 +1,4 @@
-import LayoutDefaultUser from "../components/LayoutDefaultUser.jsx";
+import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
 import { useState } from 'react';
 
 const Register = () => {
@@ -9,15 +9,58 @@ const Register = () => {
         confirmPassword: ''
     });
 
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add form validation and submit logic here
-        console.log("Form data submitted:", formData);
+        setError(null);
+        setSuccess(null);
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Hasła się nie zgadzają.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://gym-app.test/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formData.username,
+                    email: formData.email,
+                    password: formData.password
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 422) {
+                    setError("Rejestracja nie powiodła się. Użytkownik o podanym emailu lub nazwie użytkownika już istnieje.");
+                } else {
+                    setError("Wystąpił problem podczas rejestracji. Spróbuj ponownie później.");
+                }
+                return;
+            }
+
+            setSuccess("Rejestracja zakończona sukcesem! Możesz teraz się zalogować.");
+            setFormData({
+                username: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
+        } catch (err) {
+            setError("Wystąpił problem z połączeniem. Spróbuj ponownie później.");
+        }
     };
 
     return (
@@ -35,6 +78,8 @@ const Register = () => {
                 <div className="lg:w-1/2 flex flex-col justify-center items-center p-6 lg:p-12 bg-gray-100 flex-grow">
                     <h2 className="text-3xl font-bold mb-6 text-green-600">Zarejestruj się</h2>
                     <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+                        {error && <p className="text-red-600 mb-4">{error}</p>}
+                        {success && <p className="text-green-600 mb-4">{success}</p>}
                         <div className="mb-4">
                             <label className="block text-gray-700 font-semibold mb-2" htmlFor="username">Nazwa użytkownika</label>
                             <input
@@ -90,7 +135,7 @@ const Register = () => {
                             Zarejestruj się
                         </button>
                     </form>
-                    <p className="mt-6 text-gray-600">Masz już konto? <a href="/login" className="text-green-600 font-semibold hover:underline">Zaloguj się tutaj</a>.</p>
+                    <p className="mt-6 text-gray-600">Masz już konto? <a href="/user_defualt/Login" className="text-green-600 font-semibold hover:underline">Zaloguj się tutaj</a>.</p>
                 </div>
             </div>
         </LayoutDefaultUser>

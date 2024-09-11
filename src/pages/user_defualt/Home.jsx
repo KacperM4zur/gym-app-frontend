@@ -1,4 +1,4 @@
-import LayoutDefaultUser from "../components/LayoutDefaultUser.jsx";
+import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
 import { useState, useEffect } from 'react';
 import { ChartBarIcon, HeartIcon, StarIcon, InformationCircleIcon } from '@heroicons/react/24/outline'; // Import Hericons
 
@@ -49,10 +49,9 @@ const Home = () => {
                 <p className="text-lg mb-6">Rozpocznij swoją przygodę z fitness już dziś i osiągnij swoje cele.</p>
             </div>
 
-            {/* Main Content */}
-            <div className="flex flex-col lg:flex-row px-6 py-12 bg-gray-100">
+            <div className="flex flex-col lg:flex-row px-4 py-8 bg-gray-100">
                 {/* Left Image Section */}
-                <div className="lg:w-1/2 flex justify-center items-center mb-8 lg:mb-0">
+                <div className="lg:w-1/2 flex justify-center items-center mb-6 lg:mb-0">
                     <img
                         src="/src/assets/main-page-victor-freitas.jpg"
                         alt="Main Visual"
@@ -61,13 +60,14 @@ const Home = () => {
                 </div>
 
                 {/* Information Section */}
-                <div className="lg:w-1/2 flex flex-col justify-center px-6 lg:px-12">
-                    <h2 className="text-2xl font-bold mb-4">Dlaczego warto do nas dołączyć?</h2>
-                    <p className="mb-4">Nasza platforma oferuje różnorodne plany treningowe, profesjonalne porady oraz narzędzia do monitorowania postępów. Z nami możesz osiągnąć swoje cele zdrowotne i fitnessowe szybciej i efektywniej.</p>
-                    <p className="mb-4">Dołącz do naszej społeczności i korzystaj z wsparcia oraz motywacji innych użytkowników. Oferujemy również dostęp do ekskluzywnych treści i specjalnych ofert dla naszych subskrybentów.</p>
-                    <a href="/register" className="inline-block text-center bg-green-500 text-white py-3 px-6 rounded-full font-semibold shadow-lg hover:bg-green-600 transition-transform transform hover:scale-105 mt-4">Zarejestruj się</a>
+                <div className="lg:w-1/2 flex flex-col justify-center px-4 lg:px-8">
+                    <h2 className="text-2xl font-bold mb-3">Dlaczego warto do nas dołączyć?</h2>
+                    <p className="mb-3">Nasza platforma oferuje różnorodne plany treningowe, profesjonalne porady oraz narzędzia do monitorowania postępów. Z nami możesz osiągnąć swoje cele zdrowotne i fitnessowe szybciej i efektywniej.</p>
+                    <p className="mb-3">Dołącz do naszej społeczności i korzystaj z wsparcia oraz motywacji innych użytkowników. Oferujemy również dostęp do ekskluzywnych treści i specjalnych ofert dla naszych subskrybentów.</p>
+                    <a href="/user_defualt/Register" className="inline-block text-center bg-green-500 text-white py-3 px-6 rounded-full font-semibold shadow-lg hover:bg-green-600 transition-transform transform hover:scale-105 mt-4">Zarejestruj się</a>
                 </div>
             </div>
+
 
             {/* Fancy Offer Section with Alternating Images and Text */}
             <div className="px-6 py-12 bg-white">

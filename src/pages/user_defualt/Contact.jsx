@@ -1,4 +1,4 @@
-import LayoutDefaultUser from "../components/LayoutDefaultUser.jsx";
+import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
 import { useState } from 'react';
 
 const Contact = () => {

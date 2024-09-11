@@ -1,21 +1,47 @@
-import LayoutDefaultUser from "../components/LayoutDefaultUser.jsx";
+import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: ''
     });
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Logika logowania
-        console.log("Login data submitted:", formData);
+        setError(null);
+
+        try {
+            const response = await fetch('http://gym-app.test/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (response.status === 200) {
+                // Zapisz token w localStorage
+                localStorage.setItem('token', data.customer.api_token);
+
+                // Przekieruj na dashboard
+                navigate('/dashboard');
+            } else {
+                setError(data.message || "Nieprawidłowy email lub hasło.");
+            }
+        } catch (err) {
+            setError("Wystąpił problem z połączeniem. Spróbuj ponownie później.");
+        }
     };
 
     return (
@@ -33,13 +59,14 @@ const Login = () => {
                 <div className="lg:w-1/2 flex flex-col justify-center items-center p-6 lg:p-12 bg-gray-100 flex-grow">
                     <h2 className="text-3xl font-bold mb-6 text-green-600">Zaloguj się</h2>
                     <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+                        {error && <p className="text-red-600 mb-4">{error}</p>}
                         <div className="mb-4">
-                            <label className="block text-gray-700 font-semibold mb-2" htmlFor="username">Nazwa użytkownika</label>
+                            <label className="block text-gray-700 font-semibold mb-2" htmlFor="email">Email</label>
                             <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                value={formData.username}
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-green-500"
                                 required
@@ -64,7 +91,7 @@ const Login = () => {
                             Zaloguj się
                         </button>
                     </form>
-                    <p className="mt-6 text-gray-600">Nie masz konta? <a href="/register" className="text-green-600 font-semibold hover:underline">Zarejestruj się tutaj</a>.</p>
+                    <p className="mt-6 text-gray-600">Nie masz konta? <a href="/user_defualt/Register" className="text-green-600 font-semibold hover:underline">Zarejestruj się tutaj</a>.</p>
                 </div>
             </div>
         </LayoutDefaultUser>
