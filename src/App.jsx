@@ -7,7 +7,8 @@ import Login from "./pages/user_defualt/Login.jsx";
 import Guides from "./pages/user_defualt/Guides.jsx";
 import Contact from "./pages/user_defualt/Contact.jsx";
 import Faq from "./pages/user_defualt/Faq.jsx";
-import PrivateRoute from "./components/PrivateRoute.jsx";
+import PrivateRoute from "./components/routes/PrivateRoute.jsx";
+import PublicRoute from "./components/routes/PublicRoute.jsx";
 import Dashboard from "./pages/user_login/Dashboard.jsx";
 import Profile from "./pages/user_login/Profile.jsx";
 import Training from "./pages/user_login/Training.jsx";
@@ -20,14 +21,63 @@ function App() {
     return (
         <Router>
             <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/faq" element={<Faq />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/guides" element={<Guides />} />
-                <Route path="/login" element={<Login />} />
+                {/* Public Routes guarded by PublicRoute */}
+                <Route
+                    path="/"
+                    element={
+                        <PublicRoute>
+                            <Home />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/register"
+                    element={
+                        <PublicRoute>
+                            <Register />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/about"
+                    element={
+                        <PublicRoute>
+                            <About />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/faq"
+                    element={
+                        <PublicRoute>
+                            <Faq />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/contact"
+                    element={
+                        <PublicRoute>
+                            <Contact />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/guides"
+                    element={
+                        <PublicRoute>
+                            <Guides />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
 
                 {/* Private Routes with Layout */}
                 <Route
