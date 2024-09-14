@@ -16,6 +16,7 @@ import Supplementation from "./pages/user_login/Supplementation.jsx";
 import Blog from "./pages/user_login/Blog.jsx";
 import Calculators from "./pages/user_login/Calculators.jsx";
 import LayoutLoginUser from "./components/user_login/LayoutLoginUser.jsx";
+import CreatePost from "./components/user_login/blog_page/CreatePost.jsx";
 
 function App() {
     return (
@@ -126,6 +127,16 @@ function App() {
                         <PrivateRoute>
                             <LayoutLoginUser>
                                 <Blog />
+                            </LayoutLoginUser>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/create-post"
+                    element={
+                        <PrivateRoute>
+                            <LayoutLoginUser>
+                                <CreatePost />
                             </LayoutLoginUser>
                         </PrivateRoute>
                     }
