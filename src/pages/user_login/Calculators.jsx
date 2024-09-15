@@ -18,11 +18,11 @@ const Calculators = () => {
             <h1 className="text-4xl font-bold mb-8 text-center">Kalkulatory Fitness</h1>
 
             {/* Grid layout z wymuszoną stałą wysokością */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* Kafelek BMI */}
                 <div
                     onClick={() => openModal('BMI')}
-                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-[250px]" // Stała wysokość
+                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-60 w-full" // Stała wysokość
                 >
                     <CalculatorIcon className="w-12 h-12 text-blue-500 mb-4" />
                     <h2 className="text-xl font-semibold">Kalkulator BMI</h2>
@@ -32,7 +32,7 @@ const Calculators = () => {
                 {/* Kafelek TDEE */}
                 <div
                     onClick={() => openModal('TDEE')}
-                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-[250px]"
+                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-60 w-full"
                 >
                     <FireIcon className="w-12 h-12 text-red-500 mb-4" />
                     <h2 className="text-xl font-semibold">Kalkulator TDEE</h2>
@@ -42,7 +42,7 @@ const Calculators = () => {
                 {/* Kafelek One Rep Max */}
                 <div
                     onClick={() => openModal('OneRepMax')}
-                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-[250px]"
+                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-60 w-full"
                 >
                     <HeartIcon className="w-12 h-12 text-green-500 mb-4" />
                     <h2 className="text-xl font-semibold">Jedno Maksymalne Obciążenie</h2>
@@ -52,7 +52,7 @@ const Calculators = () => {
                 {/* Kafelek Body Fat */}
                 <div
                     onClick={() => openModal('BodyFat')}
-                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-[250px]"
+                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-60 w-full"
                 >
                     <ScaleIcon className="w-12 h-12 text-orange-500 mb-4" />
                     <h2 className="text-xl font-semibold">Kalkulator Indeksu Tłuszczu Ciała</h2>
@@ -62,7 +62,7 @@ const Calculators = () => {
                 {/* Kafelek Burned Calories */}
                 <div
                     onClick={() => openModal('BurnedCalories')}
-                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-[250px]"
+                    className="cursor-pointer bg-gray-100 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center transition transform hover:scale-105 h-60 w-full"
                 >
                     <LightBulbIcon className="w-12 h-12 text-yellow-500 mb-4" />
                     <h2 className="text-xl font-semibold">Kalkulator Spalonych Kalorii</h2>
