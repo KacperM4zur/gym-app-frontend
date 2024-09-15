@@ -14,12 +14,12 @@ const Training = () => {
             name: 'Trening siłowy A',
             days: {
                 'Poniedziałek': [
-                    { exercise: 'Przysiady', sets: '4', reps: '12', rest: '1' },
-                    { exercise: 'Martwy ciąg', sets: '3', reps: '10', rest: '2' },
+                    { exercise: 'Przysiady', sets: '4', reps: '12', rest: '1 min' },
+                    { exercise: 'Martwy ciąg', sets: '3', reps: '10', rest: '2 min' },
                 ],
                 'Wtorek': [
-                    { exercise: 'Wyciskanie na ławce', sets: '4', reps: '10', rest: '1.5' },
-                    { exercise: 'Podciąganie', sets: '3', reps: '8', rest: '2' },
+                    { exercise: 'Wyciskanie na ławce', sets: '4', reps: '10', rest: '1.5 min' },
+                    { exercise: 'Podciąganie', sets: '3', reps: '8', rest: '2 min' },
                 ],
             }
         },
@@ -27,8 +27,8 @@ const Training = () => {
             name: 'Trening funkcjonalny',
             days: {
                 'Środa': [
-                    { exercise: 'Plank', sets: '3', reps: '1 min', rest: '2' },
-                    { exercise: 'Wiosłowanie hantlami', sets: '4', reps: '12', rest: '1.5' },
+                    { exercise: 'Plank', sets: '3', reps: '1 min', rest: '2 min' },
+                    { exercise: 'Wiosłowanie hantlami', sets: '4', reps: '12', rest: '1.5 min' },
                 ]
             }
         },
@@ -39,23 +39,19 @@ const Training = () => {
     const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
     const exerciseOptions = ['Przysiady', 'Martwy ciąg', 'Wyciskanie na ławce', 'Podciąganie', 'Plank'];
 
-    // Funkcja do wyboru dnia
     const selectDay = (day) => {
         setSelectedDay(day);
-        setStep(2);  // Przejście do następnego kroku (dodawanie ćwiczeń)
+        setStep(2);  // Przejście do następnego kroku
     };
 
-    // Obsługa zmiany w formularzu ćwiczeń
     const handleExerciseChange = (e) => {
         setCurrentExercise({ ...currentExercise, [e.target.name]: e.target.value });
     };
 
-    // Obsługa zmiany nazwy planu
     const handlePlanNameChange = (e) => {
         setPlanName(e.target.value);
     };
 
-    // Dodanie ćwiczenia do wybranego dnia
     const addExercise = () => {
         if (currentExercise.exercise && currentExercise.sets && currentExercise.reps && currentExercise.rest) {
             setTrainingPlan((prev) => ({
@@ -67,7 +63,6 @@ const Training = () => {
         }
     };
 
-    // Zapisanie planu treningowego
     const savePlan = () => {
         if (planName && Object.keys(trainingPlan).length > 0) {
             setSavedPlans((prevPlans) => [
@@ -78,13 +73,13 @@ const Training = () => {
             setPlanName('');
             setStep(1);
             setIsPlanNameSet(false);  // Reset po zapisaniu planu
+            console.log('Zapisany plan treningowy:', { planName, trainingPlan });
         }
     };
 
-    // Ustawienie nazwy planu
     const handleSetPlanName = () => {
         if (planName) {
-            setIsPlanNameSet(true);  // Ustaw nazwę planu, tylko raz
+            setIsPlanNameSet(true);
         }
     };
 
@@ -95,7 +90,8 @@ const Training = () => {
             {/* Sekcja zapisanych planów */}
             <SavedTrainingPlans plans={savedPlans} />
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+                {/* Wybór dni */}
                 <div className="col-span-1">
                     <DaySelectionTraining
                         daysOfWeek={daysOfWeek}
@@ -105,7 +101,7 @@ const Training = () => {
                 </div>
 
                 <div className="col-span-3">
-                    {/* Pole nazwy planu wyświetlane tylko raz, przed dodawaniem ćwiczeń */}
+                    {/* Wyświetl pole nazwy planu tylko raz, przed dodawaniem ćwiczeń */}
                     {!isPlanNameSet && (
                         <div className="mb-6">
                             <label className="block text-gray-700 font-semibold mb-2">Nazwa planu</label>
@@ -143,10 +139,11 @@ const Training = () => {
                             <TrainingSummary daysOfWeek={daysOfWeek} trainingPlan={trainingPlan} />
 
                             {/* Przycisk zapisu planu */}
-                            <div className="flex justify-center">
+                            <div className="flex justify-center mt-10">
                                 <button
                                     onClick={savePlan}
-                                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-105"
+                                    className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-105 mt-6"
+                                    style={{ marginBottom: "80px" }}  // Przesunięcie przycisku
                                 >
                                     Zapisz plan
                                 </button>

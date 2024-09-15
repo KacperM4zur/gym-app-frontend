@@ -1,14 +1,14 @@
 import React from 'react';
 
-const Summary = ({ daysOfWeek, supplements }) => {
+const SupplementSummary = ({ daysOfWeek, supplements }) => {
     return (
-        <div className="mb-8">
-            <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Twój plan suplementacyjny</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mt-8">
+            <h2 className="text-3xl font-bold mb-6 text-center">Podsumowanie Planu</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {daysOfWeek.map((day) => (
-                    <div key={day} className="bg-gray-100 shadow-lg rounded-lg p-6">
-                        <h3 className="text-xl font-semibold mb-4 text-gray-700">{day}</h3>
-                        <ul className="list-disc list-inside text-gray-600">
+                    <div key={day} className="bg-white p-4 rounded-lg shadow-md">
+                        <h3 className="text-xl font-bold">{day}</h3>
+                        <ul className="list-disc list-inside">
                             {supplements[day] ? (
                                 supplements[day].map((supplement, index) => (
                                     <li key={index} className="mb-2">
@@ -26,4 +26,4 @@ const Summary = ({ daysOfWeek, supplements }) => {
     );
 };
 
-export default Summary;
+export default SupplementSummary;

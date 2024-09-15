@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DaySelectionTraining = ({ daysOfWeek, selectedDay, selectDay }) => {
+const DaySelectionSupplement = ({ daysOfWeek, selectedDay, selectDay }) => {
     return (
         <div className="mb-8">
             <h2 className="text-2xl font-bold text-center mb-4">Wybierz dzień</h2>
@@ -21,4 +21,4 @@ const DaySelectionTraining = ({ daysOfWeek, selectedDay, selectDay }) => {
     );
 };
 
-export default DaySelectionTraining;
+export default DaySelectionSupplement;

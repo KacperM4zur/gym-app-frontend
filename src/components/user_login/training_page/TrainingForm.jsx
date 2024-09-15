@@ -4,9 +4,9 @@ import {PlusCircleIcon, XCircleIcon} from "@heroicons/react/16/solid";
 const TrainingForm = ({ currentExercise, handleExerciseChange, addExercise, setStep, selectedDay, exerciseOptions }) => {
     return (
         <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-center text-gray-800">Dodaj ćwiczenie dla {selectedDay}</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-center">Dodaj ćwiczenie dla {selectedDay}</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <select
                     name="exercise"
                     value={currentExercise.exercise}
@@ -14,8 +14,8 @@ const TrainingForm = ({ currentExercise, handleExerciseChange, addExercise, setS
                     className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">Wybierz ćwiczenie</option>
-                    {exerciseOptions.map((exercise) => (
-                        <option key={exercise} value={exercise}>{exercise}</option>
+                    {exerciseOptions.map((exercise, index) => (
+                        <option key={index} value={exercise}>{exercise}</option>
                     ))}
                 </select>
                 <input
@@ -35,7 +35,7 @@ const TrainingForm = ({ currentExercise, handleExerciseChange, addExercise, setS
                     className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <input
-                    type="text"
+                    type="number"
                     name="rest"
                     placeholder="Przerwa (minuty)"
                     value={currentExercise.rest}

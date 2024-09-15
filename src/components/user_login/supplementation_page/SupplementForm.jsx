@@ -1,11 +1,19 @@
 import React from 'react';
-import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/16/solid";
+import {PlusCircleIcon, XCircleIcon} from "@heroicons/react/16/solid";
 
-const SupplementForm = ({ currentSupplement, handleSupplementChange, addSupplement, setStep, selectedDay, supplementOptions }) => {
+const SupplementForm = ({
+                            currentSupplement,
+                            handleSupplementChange,
+                            addSupplement,
+                            setStep,
+                            selectedDay,
+                            supplementOptions,
+                        }) => {
     return (
         <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-center text-gray-800">Dodaj suplement dla {selectedDay}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <h2 className="text-2xl font-semibold mb-4 text-center">Dodaj suplement dla {selectedDay}</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <select
                     name="name"
                     value={currentSupplement.name}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SavedTrainingPlans = ({ plans }) => {
+const SavedSupplementPlans = ({ plans }) => {
     const [expandedPlan, setExpandedPlan] = useState(null);
 
     const togglePlan = (index) => {
@@ -9,7 +9,7 @@ const SavedTrainingPlans = ({ plans }) => {
 
     return (
         <div className="mb-6">
-            <h2 className="text-3xl font-bold mb-6 text-center">Zapisane Plany Treningowe</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center">Zapisane Plany Suplementacyjne</h2>
             {plans.map((plan, index) => (
                 <div
                     key={index}
@@ -32,13 +32,13 @@ const SavedTrainingPlans = ({ plans }) => {
                     </div>
                     {expandedPlan === index && (
                         <div className="mt-4">
-                            {Object.entries(plan.days).map(([day, exercises], i) => (
+                            {Object.entries(plan.days).map(([day, supplements], i) => (
                                 <div key={i} className="mb-4">
                                     <h4 className="font-semibold">{day}</h4>
                                     <ul className="list-disc list-inside">
-                                        {exercises.map((exercise, j) => (
+                                        {supplements.map((supplement, j) => (
                                             <li key={j}>
-                                                {exercise.exercise} - Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Przerwa: {exercise.rest}
+                                                {supplement.name} - {supplement.amount} - {supplement.time}
                                             </li>
                                         ))}
                                     </ul>
@@ -52,4 +52,4 @@ const SavedTrainingPlans = ({ plans }) => {
     );
 };
 
-export default SavedTrainingPlans;
+export default SavedSupplementPlans;

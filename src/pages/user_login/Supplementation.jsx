@@ -1,43 +1,38 @@
-// pages/Supplementation.jsx
 import React, { useState } from 'react';
-import DaySelection from "../../components/user_login/supplementation_page/DaySelection.jsx";
+import DaySelectionSupplement from "../../components/user_login/supplementation_page/DaySelectionSupplement.jsx";
 import SupplementForm from "../../components/user_login/supplementation_page/SupplementForm.jsx";
-import Summary from "../../components/user_login/supplementation_page/Summary.jsx";
-import SavedPlans from "../../components/user_login/supplementation_page/SavedPlans.jsx";
-import PlanModal from "../../components/user_login/supplementation_page/PlanModal.jsx";
+import SupplementSummary from "../../components/user_login/supplementation_page/SupplementSummary.jsx";
+import SavedSupplementPlans from "../../components/user_login/supplementation_page/SavedSupplementPlans.jsx";
 
 const Supplementation = () => {
     const [step, setStep] = useState(1);  // Krok kreatora
     const [selectedDay, setSelectedDay] = useState('');  // Wybrany dzień
     const [supplements, setSupplements] = useState({});  // Plan suplementacyjny dla dni
     const [currentSupplement, setCurrentSupplement] = useState({ name: '', amount: '', time: '' });  // Aktualny suplement
-    const [selectedPlan, setSelectedPlan] = useState(null);  // Wybrany plan do podglądu
-
-    // Przechowujemy zapisane plany w stanie
     const [savedPlans, setSavedPlans] = useState([
         {
-            'Poniedziałek': [
-                { name: 'Białko', amount: '30g', time: 'rano' },
-                { name: 'Kreatyna', amount: '5g', time: 'po treningu' },
-            ],
-            'Wtorek': [
-                { name: 'BCAA', amount: '10g', time: 'przed treningiem' },
-            ],
-            'Środa': [
-                { name: 'Witamina D', amount: '2000 IU', time: 'rano' },
-            ],
+            name: 'Plan A',
+            days: {
+                'Poniedziałek': [
+                    { name: 'Białko', amount: '30g', time: 'rano' },
+                    { name: 'Kreatyna', amount: '5g', time: 'po treningu' },
+                ],
+                'Wtorek': [
+                    { name: 'Omega 3', amount: '1 kapsułka', time: 'rano' },
+                ],
+            }
         },
         {
-            'Czwartek': [
-                { name: 'Omega 3', amount: '1 kapsułka', time: 'rano' },
-                { name: 'Białko', amount: '25g', time: 'po treningu' },
-            ],
-            'Piątek': [
-                { name: 'Kreatyna', amount: '5g', time: 'po treningu' },
-                { name: 'Witamina D', amount: '2000 IU', time: 'rano' },
-            ],
+            name: 'Plan B',
+            days: {
+                'Środa': [
+                    { name: 'BCAA', amount: '10g', time: 'przed treningiem' },
+                ]
+            }
         },
     ]);
+    const [planName, setPlanName] = useState('');  // Nazwa planu
+    const [isPlanNameSet, setIsPlanNameSet] = useState(false);  // Czy nazwa planu została ustawiona
 
     const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
     const supplementOptions = ['Białko', 'Kreatyna', 'Witamina D', 'Omega 3', 'BCAA'];
@@ -51,6 +46,10 @@ const Supplementation = () => {
         setCurrentSupplement({ ...currentSupplement, [e.target.name]: e.target.value });
     };
 
+    const handlePlanNameChange = (e) => {
+        setPlanName(e.target.value);
+    };
+
     const addSupplement = () => {
         if (currentSupplement.name && currentSupplement.amount && currentSupplement.time) {
             setSupplements((prev) => ({
@@ -62,41 +61,37 @@ const Supplementation = () => {
         }
     };
 
-    // Funkcja zapisująca nowy plan do listy
     const savePlan = () => {
-        if (Object.keys(supplements).length > 0) {
-            setSavedPlans((prevPlans) => [...prevPlans, supplements]); // Dodaj nowy plan do zapisanych
-            setSupplements({});  // Wyczyść obecny plan po zapisaniu
-            setStep(1);  // Powrót do kroku 1
-            console.log("Nowy plan zapisany:", supplements);  // Można go później wysłać do backendu
+        if (planName && Object.keys(supplements).length > 0) {
+            setSavedPlans((prevPlans) => [
+                ...prevPlans,
+                { name: planName, days: supplements }
+            ]);
+            setSupplements({});
+            setPlanName('');
+            setStep(1);
+            setIsPlanNameSet(false);  // Reset po zapisaniu planu
+            console.log('Zapisany plan:', { planName, supplements });
         }
     };
 
-    const selectPlan = (plan) => {
-        setSelectedPlan(plan);  // Zapisz wybrany plan do podglądu
-    };
-
-    const closeModal = () => {
-        setSelectedPlan(null);  // Zamykanie modala
+    const handleSetPlanName = () => {
+        if (planName) {
+            setIsPlanNameSet(true);
+        }
     };
 
     return (
         <div className="container mx-auto p-6">
+            <h1 className="text-5xl font-bold mb-6 text-center text-gray-900">Kreator Planu Suplementacyjnego</h1>
 
-            {/* Sekcja zapisywanych planów */}
-            <SavedPlans plans={savedPlans} selectPlan={selectPlan} />
+            {/* Sekcja zapisanych planów */}
+            <SavedSupplementPlans plans={savedPlans} />
 
-            {/* Modal z podglądem wybranego planu */}
-            {selectedPlan && (
-                <PlanModal plan={selectedPlan} closeModal={closeModal} daysOfWeek={daysOfWeek} />
-            )}
-
-            <h1 className="text-4xl font-bold mb-6 text-center text-gray-900">Kreator Planu Suplementacyjnego</h1>
-
-            {/* Sekcja nowego planu */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+                {/* Wybór dni */}
                 <div className="col-span-1">
-                    <DaySelection
+                    <DaySelectionSupplement
                         daysOfWeek={daysOfWeek}
                         selectedDay={selectedDay}
                         selectDay={selectDay}
@@ -104,7 +99,28 @@ const Supplementation = () => {
                 </div>
 
                 <div className="col-span-3">
-                    {step === 2 && (
+                    {/* Wyświetl pole nazwy planu tylko raz, przed dodawaniem suplementów */}
+                    {!isPlanNameSet && (
+                        <div className="mb-6">
+                            <label className="block text-gray-700 font-semibold mb-2">Nazwa planu</label>
+                            <input
+                                type="text"
+                                value={planName}
+                                onChange={handlePlanNameChange}
+                                placeholder="Wprowadź nazwę planu"
+                                className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button
+                                onClick={handleSetPlanName}
+                                className="bg-blue-500 text-white px-6 py-3 mt-3 rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-105"
+                            >
+                                Zatwierdź nazwę planu
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Formularz dodawania suplementów */}
+                    {isPlanNameSet && step === 2 && (
                         <SupplementForm
                             currentSupplement={currentSupplement}
                             handleSupplementChange={handleSupplementChange}
@@ -115,16 +131,23 @@ const Supplementation = () => {
                         />
                     )}
 
-                    <Summary daysOfWeek={daysOfWeek} supplements={supplements} />
+                    {/* Podsumowanie planu */}
+                    {isPlanNameSet && (
+                        <>
+                            <SupplementSummary daysOfWeek={daysOfWeek} supplements={supplements} />
 
-                    <div className="flex justify-center">
-                        <button
-                            onClick={savePlan}
-                            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-105"
-                        >
-                            Zapisz plan
-                        </button>
-                    </div>
+                            {/* Przycisk zapisu planu */}
+                            <div className="flex justify-center mt-10">
+                                <button
+                                    onClick={savePlan}
+                                    className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-105 mt-6"
+                                    style={{ marginBottom: "80px" }}  // Przesunięcie przycisku
+                                >
+                                    Zapisz plan
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
