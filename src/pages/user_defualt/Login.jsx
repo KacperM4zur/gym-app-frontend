@@ -31,11 +31,16 @@ const Login = () => {
             const data = await response.json();
 
             if (response.status === 200) {
-                // Zapisz token w localStorage
+                // Zapisz token i role_id w localStorage
                 localStorage.setItem('token', data.customer.api_token);
+                localStorage.setItem('role_id', data.customer.role_id);  // Zapisz role_id
 
-                // Przekieruj na dashboard
-                navigate('/dashboard');
+                // Przekieruj na odpowiednią stronę na podstawie roli
+                if (data.customer.role_id === 4) {
+                    navigate('/trainer-dashboard'); // Dla trenera
+                } else {
+                    navigate('/dashboard'); // Dla zwykłego użytkownika
+                }
             } else {
                 setError(data.message || "Nieprawidłowy email lub hasło.");
             }

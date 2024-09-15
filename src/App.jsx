@@ -17,140 +17,43 @@ import Blog from "./pages/user_login/Blog.jsx";
 import Calculators from "./pages/user_login/Calculators.jsx";
 import LayoutLoginUser from "./components/user_login/LayoutLoginUser.jsx";
 import CreatePost from "./components/user_login/blog_page/CreatePost.jsx";
+import TrainerDashboard from "./pages/trainer/TrainerDashboard.jsx";
+import TrainerLayout from "./components/trainer/TrainerLayout.jsx";
+import EducationalMaterials from "./pages/trainer/EducationalMaterials.jsx";
+import TrainingPlans from "./pages/trainer/TrainingPlans.jsx";
+import SupplementPlans from "./pages/trainer/SupplementPlans.jsx";
+import Clients from "./pages/trainer/Clients.jsx";
+import ProgressTracking from "./pages/trainer/ProgressTracking.jsx";
 
 function App() {
     return (
         <Router>
             <Routes>
                 {/* Public Routes guarded by PublicRoute */}
-                <Route
-                    path="/"
-                    element={
-                        <PublicRoute>
-                            <Home />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/register"
-                    element={
-                        <PublicRoute>
-                            <Register />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/about"
-                    element={
-                        <PublicRoute>
-                            <About />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/faq"
-                    element={
-                        <PublicRoute>
-                            <Faq />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/contact"
-                    element={
-                        <PublicRoute>
-                            <Contact />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/guides"
-                    element={
-                        <PublicRoute>
-                            <Guides />
-                        </PublicRoute>
-                    }
-                />
-                <Route
-                    path="/login"
-                    element={
-                        <PublicRoute>
-                            <Login />
-                        </PublicRoute>
-                    }
-                />
+                <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
+                <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+                <Route path="/about" element={<PublicRoute><About /></PublicRoute>} />
+                <Route path="/faq" element={<PublicRoute><Faq /></PublicRoute>} />
+                <Route path="/contact" element={<PublicRoute><Contact /></PublicRoute>} />
+                <Route path="/guides" element={<PublicRoute><Guides /></PublicRoute>} />
+                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
-                {/* Private Routes with Layout */}
-                <Route
-                    path="/dashboard"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <Dashboard />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/profile"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <Profile />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/training"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <Training />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/supplementation"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <Supplementation />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/blog"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <Blog />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/create-post"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <CreatePost />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/calculators"
-                    element={
-                        <PrivateRoute>
-                            <LayoutLoginUser>
-                                <Calculators />
-                            </LayoutLoginUser>
-                        </PrivateRoute>
-                    }
-                />
+                {/* Private Routes for any logged-in user */}
+                <Route path="/dashboard" element={<PrivateRoute><LayoutLoginUser><Dashboard /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/profile" element={<PrivateRoute><LayoutLoginUser><Profile /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/training" element={<PrivateRoute><LayoutLoginUser><Training /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/supplementation" element={<PrivateRoute><LayoutLoginUser><Supplementation /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/blog" element={<PrivateRoute><LayoutLoginUser><Blog /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/create-post" element={<PrivateRoute><LayoutLoginUser><CreatePost /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/calculators" element={<PrivateRoute><LayoutLoginUser><Calculators /></LayoutLoginUser></PrivateRoute>} />
+
+                {/* Trainer Private Routes */}
+                <Route path="/trainer-dashboard" element={<PrivateRoute roleRequired={4}><TrainerLayout><TrainerDashboard /></TrainerLayout></PrivateRoute>} />
+                <Route path="/trainer-materials" element={<PrivateRoute roleRequired={4}><TrainerLayout><EducationalMaterials /></TrainerLayout></PrivateRoute>} />
+                <Route path="/trainer-workout-plans" element={<PrivateRoute roleRequired={4}><TrainerLayout><TrainingPlans /></TrainerLayout></PrivateRoute>} />
+                <Route path="/trainer-supplement-plans" element={<PrivateRoute roleRequired={4}><TrainerLayout><SupplementPlans /></TrainerLayout></PrivateRoute>} />
+                <Route path="/trainer-clients" element={<PrivateRoute roleRequired={4}><TrainerLayout><Clients /></TrainerLayout></PrivateRoute>} />
+                <Route path="/trainer-progress" element={<PrivateRoute roleRequired={4}><TrainerLayout><ProgressTracking /></TrainerLayout></PrivateRoute>} />
             </Routes>
         </Router>
     );
