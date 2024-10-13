@@ -24,6 +24,8 @@ import TrainingPlans from "./pages/trainer/TrainingPlans.jsx";
 import SupplementPlans from "./pages/trainer/SupplementPlans.jsx";
 import Clients from "./pages/trainer/Clients.jsx";
 import ProgressTracking from "./pages/trainer/ProgressTracking.jsx";
+import Consultations from "./pages/user_login/Consultations.jsx";
+import Progress from "./pages/user_login/Progress.jsx";
 
 function App() {
     return (
@@ -46,6 +48,8 @@ function App() {
                 <Route path="/blog" element={<PrivateRoute><LayoutLoginUser><Blog /></LayoutLoginUser></PrivateRoute>} />
                 <Route path="/create-post" element={<PrivateRoute><LayoutLoginUser><CreatePost /></LayoutLoginUser></PrivateRoute>} />
                 <Route path="/calculators" element={<PrivateRoute><LayoutLoginUser><Calculators /></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/consultations" element={<PrivateRoute><LayoutLoginUser><Consultations/></LayoutLoginUser></PrivateRoute>} />
+                <Route path="/progress" element={<PrivateRoute><LayoutLoginUser><Progress/></LayoutLoginUser></PrivateRoute>} />
 
                 {/* Trainer Private Routes */}
                 <Route path="/trainer-dashboard" element={<PrivateRoute roleRequired={4}><TrainerLayout><TrainerDashboard /></TrainerLayout></PrivateRoute>} />

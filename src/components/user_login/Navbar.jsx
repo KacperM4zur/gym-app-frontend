@@ -29,6 +29,8 @@ const Navbar = () => {
                         <Link to="/supplementation" className="mr-4">Suplementacja</Link>
                         <Link to="/blog" className="mr-4">Blog</Link>
                         <Link to="/calculators" className="mr-4">Kalkulatory</Link>
+                        <Link to="/consultations" className="mr-4">Konsultacje</Link>
+                        <Link to="/progress" className="mr-4">Proges</Link>
                     </div>
                 </div>
                 <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">Wyloguj</button>
@@ -42,6 +44,8 @@ const Navbar = () => {
                     <Link to="/supplementation" className="block py-2">Suplementacja</Link>
                     <Link to="/blog" className="block py-2">Blog</Link>
                     <Link to="/calculators" className="block py-2">Kalkulatory</Link>
+                    <Link to="/consultations" className="block py-2">Konsultacje</Link>
+                    <Link to="/progress" className="block py-2">Progres</Link>
                 </div>
             )}
         </nav>
