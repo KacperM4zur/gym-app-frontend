@@ -8,6 +8,7 @@ import {
     ShieldCheckIcon,
     UsersIcon
 } from "@heroicons/react/16/solid/index.js";
+import React from "react";
 
 
 const About = () => {
@@ -56,29 +57,29 @@ const About = () => {
 
     return (
         <LayoutDefaultUser>
-            <div className="flex-grow min-h-full bg-gradient-to-r from-gray-50 to-gray-100 p-6">
-                {/* Górny opis */}
-                <div className="text-center mb-10">
-                    <h1 className="text-5xl font-bold text-gray-800 mb-4">Informacje o aplikacji</h1>
-                    <p className="text-lg max-w-3xl mx-auto text-gray-600">
-                        Nasza aplikacja jest zaprojektowana, aby pomóc Ci w osiągnięciu Twoich celów treningowych i zdrowotnych.
-                        Poniżej znajdziesz kluczowe informacje na temat naszej platformy.
-                    </p>
+            <div>
+                <div className="bg-gray-700 text-white py-8 text-center">
+                    <h1 className="text-3xl font-bold mb-2">Informacje o aplikacji</h1>
+                    <p className="text-lg mb-6">Nasza aplikacja jest zaprojektowana, aby pomóc Ci w osiągnięciu Twoich celów treningowych i zdrowotnych.
+                        Poniżej znajdziesz kluczowe informacje na temat naszej platformy.</p>
                 </div>
+                <div className="flex-grow min-h-full bg-gradient-to-r from-gray-50 to-gray-100 p-6">
 
-                {/* Sekcja z kartami */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    {cards.map((card, index) => (
-                        <div key={index} className="bg-white p-8 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
-                            <div className="flex items-center mb-4">
-                                {card.icon}
-                                <h2 className="text-3xl font-bold text-gray-800 ml-4">{card.title}</h2>
+                    {/* Sekcja z kartami */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                        {cards.map((card, index) => (
+                            <div key={index} className="bg-white p-8 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+                                <div className="flex items-center mb-4">
+                                    {card.icon}
+                                    <h2 className="text-3xl font-bold text-gray-800 ml-4">{card.title}</h2>
+                                </div>
+                                <p className="text-gray-700">{card.description}</p>
                             </div>
-                            <p className="text-gray-700">{card.description}</p>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
+
         </LayoutDefaultUser>
     );
 };

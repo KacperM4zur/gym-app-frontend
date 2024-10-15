@@ -1,178 +1,124 @@
+import React, { useState } from 'react';
+import CategoryCard from "../../components/user_defualt/guides_page/CategoryCard.jsx";
+import ItemList from "../../components/user_defualt/guides_page/ItemList.jsx";
+import ItemsDetailsModal from "../../components/user_defualt/guides_page/ItemsDetailsModal.jsx";
 import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
-import { useState } from 'react';
-import ModalGuides from "../../components/user_defualt/guides_page/ModalGuides.jsx";
 
 const Guides = () => {
-    const [selectedPart, setSelectedPart] = useState(null);
-    const [selectedExercise, setSelectedExercise] = useState(null);
-    const [selectedPlan, setSelectedPlan] = useState(null);
-    const [filter, setFilter] = useState('Wszystkie');
+    const [selectedCategory, setSelectedCategory] = useState('Wszystkie');
+    const [selectedSection, setSelectedSection] = useState('Ćwiczenia');
+    const [selectedItem, setSelectedItem] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
-    const bodyParts = ["Klatka piersiowa", "Plecy", "Nogi", "Ramiona", "Barki", "Brzuch"];
+    const exerciseCategories = ['Wszystkie', 'Klatka piersiowa', 'Plecy', 'Nogi', 'Ramiona', 'Barki', 'Brzuch'];
+    const supplementCategories = ['Wszystkie', 'Białka', 'Witaminy', 'Kreatyna', 'Aminokwasy', 'Mineraly'];
+
     const exercises = [
-        { name: "Wyciskanie sztangi", part: "Klatka piersiowa", description: "Wyciskanie sztangi to podstawowe ćwiczenie na klatkę piersiową, idealne do budowania siły." },
-        { name: "Rozpiętki", part: "Klatka piersiowa", description: "Rozpiętki to świetne ćwiczenie izolacyjne na rozwój klatki piersiowej." },
-        { name: "Pompki", part: "Klatka piersiowa", description: "Pompki wzmacniają klatkę, triceps i barki." },
-        { name: "Martwy ciąg", part: "Plecy", description: "Martwy ciąg to kompleksowe ćwiczenie na plecy i nogi." },
-        { name: "Wiosłowanie sztangą", part: "Plecy", description: "Wiosłowanie wzmacnia mięśnie pleców i ramion." },
-        { name: "Przysiady", part: "Nogi", description: "Przysiady rozwijają siłę nóg i ogólną wytrzymałość." },
-        // Dodaj więcej ćwiczeń tutaj
-    ];
-
-    const plans = [
         {
-            name: "Plan dla początkujących",
-            target: "Osoby początkujące",
-            description: "Prosty plan na 3 dni, idealny na start.",
-            volume: "3 serie, 10 powtórzeń na każde ćwiczenie",
-            days: {
-                "Poniedziałek": [
-                    { exercise: "Wyciskanie sztangi", sets: 3, reps: 10 },
-                    { exercise: "Pompki", sets: 3, reps: 12 },
-                    { exercise: "Przysiady", sets: 4, reps: 10 }
-                ],
-                "Środa": [
-                    { exercise: "Martwy ciąg", sets: 3, reps: 8 },
-                    { exercise: "Wiosłowanie sztangą", sets: 4, reps: 10 }
-                ],
-                "Piątek": [
-                    { exercise: "Rozpiętki", sets: 3, reps: 12 },
-                    { exercise: "Przysiady", sets: 4, reps: 10 }
-                ]
-            }
+            name: 'Wyciskanie sztangi',
+            part: 'Klatka piersiowa',
+            description: 'Wyciskanie sztangi to podstawowe ćwiczenie na klatkę piersiową.',
+            technique: 'Połóż się na ławce, sztanga powinna znajdować się nad twoimi oczami. Powoli opuszczaj ją na klatkę piersiową, a następnie wypychaj w górę.',
+            advantages: 'Zwiększa siłę klatki piersiowej, tricepsów i barków.',
+            disadvantages: 'Może powodować kontuzje ramion, jeśli nie wykonane poprawnie.',
         },
         {
-            name: "Plan siłowy",
-            target: "Zaawansowani",
-            description: "Plan 4-dniowy skupiony na sile.",
-            volume: "4 serie, 6 powtórzeń na każde ćwiczenie",
-            days: {
-                "Poniedziałek": [
-                    { exercise: "Wyciskanie sztangi", sets: 4, reps: 6 },
-                    { exercise: "Przysiady", sets: 4, reps: 6 }
-                ],
-                "Wtorek": [
-                    { exercise: "Martwy ciąg", sets: 3, reps: 5 },
-                    { exercise: "Wiosłowanie sztangą", sets: 4, reps: 6 }
-                ],
-                "Czwartek": [
-                    { exercise: "Pompki", sets: 4, reps: 12 },
-                    { exercise: "Rozpiętki", sets: 3, reps: 10 }
-                ],
-                "Piątek": [
-                    { exercise: "Przysiady", sets: 4, reps: 6 },
-                    { exercise: "Martwy ciąg", sets: 3, reps: 5 }
-                ]
-            }
+            name: 'Martwy ciąg',
+            part: 'Plecy',
+            description: 'Martwy ciąg to jedno z najskuteczniejszych ćwiczeń na mięśnie pleców i nóg.',
+            technique: 'Stój z nogami na szerokości barków, trzymając sztangę. Utrzymuj proste plecy, pochyl się i podnieś sztangę, wyprostowując nogi.',
+            advantages: 'Wzmacnia plecy, nogi, pośladki oraz poprawia stabilność.',
+            disadvantages: 'Nieprawidłowa technika może prowadzić do kontuzji pleców.',
         },
+        // Inne ćwiczenia...
     ];
 
-    const filteredExercises = filter === 'Wszystkie' ? exercises : exercises.filter(exercise => exercise.part === filter);
+    const supplements = [
+        {
+            name: 'Białko serwatkowe',
+            category: 'Białka',
+            description: 'Białko serwatkowe wspomaga regenerację mięśni.',
+            benefits: 'Przyspiesza regenerację mięśni po treningu, dostarcza wysokiej jakości białko.',
+            disadvantages: 'Nieodpowiednie dla osób nietolerujących laktozy.',
+        },
+        {
+            name: 'Witamina D',
+            category: 'Witaminy',
+            description: 'Witamina D wspomaga układ odpornościowy i zdrowie kości.',
+            benefits: 'Wzmacnia układ odpornościowy, poprawia zdrowie kości.',
+            disadvantages: 'Może prowadzić do nadmiernego poziomu wapnia we krwi przy zbyt dużych dawkach.',
+        },
+        // Inne suplementy...
+    ];
 
-    const handleFilterChange = (part) => {
-        setFilter(part);
+    const filteredItems = selectedCategory === 'Wszystkie'
+        ? (selectedSection === 'Ćwiczenia' ? exercises : supplements)
+        : (selectedSection === 'Ćwiczenia'
+            ? exercises.filter(ex => ex.part === selectedCategory)
+            : supplements.filter(sup => sup.category === selectedCategory));
+
+    const handleCategoryClick = (category) => {
+        setSelectedCategory(category);
     };
 
-    const openPlanModal = (plan) => {
-        setSelectedPlan(plan);
-        setShowModal(true);
+    const handleSectionChange = (section) => {
+        setSelectedCategory('Wszystkie');
+        setSelectedSection(section);
     };
 
-    const openExerciseModal = (exercise) => {
-        setSelectedExercise(exercise);
+    const openItemDetails = (item) => {
+        setSelectedItem(item);
         setShowModal(true);
     };
 
     const closeModal = () => {
         setShowModal(false);
-        setSelectedExercise(null);
-        setSelectedPlan(null);
+        setSelectedItem(null);
     };
 
     return (
         <LayoutDefaultUser>
-            <div className="p-6 bg-gray-100 flex flex-col items-center">
-                <h1 className="text-5xl font-bold mb-6 text-green-600">Poradniki</h1>
+            <div className="bg-gray-700 text-white py-8 text-center">
+                <h1 className="text-3xl font-bold mb-2">Poradniki</h1>
+                <p className="text-lg mb-6">Rozpocznij swoją przygodę z fitness już dziś i osiągnij swoje cele.</p>
+            </div>
+            <div className="container mx-auto p-6">
+                {/*<h1 className="text-5xl font-bold mb-10 text-center">Poradniki</h1>*/}
 
-                {/* Sekcja filtrów i ćwiczeń */}
-                <div className="w-full max-w-4xl mb-10">
-                    <h2 className="text-3xl font-bold mb-4 text-gray-800">Ćwiczenia</h2>
-
-                    {/* Filtr ćwiczeń */}
-                    <div className="mb-6 flex space-x-4">
-                        <button onClick={() => handleFilterChange('Wszystkie')} className={`px-4 py-2 rounded-lg ${filter === 'Wszystkie' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>Wszystkie</button>
-                        {bodyParts.map((part, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleFilterChange(part)}
-                                className={`px-4 py-2 rounded-lg ${filter === part ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
-                            >
-                                {part}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Lista ćwiczeń */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredExercises.map((exercise, index) => (
-                            <div
-                                key={index}
-                                onClick={() => openExerciseModal(exercise)}
-                                className="bg-white p-6 rounded-lg shadow-lg hover:bg-green-200 cursor-pointer transition-all duration-300"
-                            >
-                                <h3 className="text-2xl font-semibold text-gray-800">{exercise.name}</h3>
-                            </div>
-                        ))}
-                    </div>
+                {/* Przełącznik między Ćwiczeniami a Suplementacją */}
+                <div className="flex justify-center mb-10">
+                    <button
+                        onClick={() => handleSectionChange('Ćwiczenia')}
+                        className={`transition-transform transform hover:scale-110 px-8 py-3 mx-4 rounded-full shadow-md text-xl font-semibold ${selectedSection === 'Ćwiczenia' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                    >
+                        Ćwiczenia
+                    </button>
+                    <button
+                        onClick={() => handleSectionChange('Suplementacja')}
+                        className={`transition-transform transform hover:scale-110 px-8 py-3 mx-4 rounded-full shadow-md text-xl font-semibold ${selectedSection === 'Suplementacja' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                    >
+                        Suplementacja
+                    </button>
                 </div>
 
-                {/* Sekcja planów */}
-                <div className="w-full max-w-4xl mb-10">
-                    <h2 className="text-3xl font-bold mb-4 text-gray-800">Przykładowe plany treningowe</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {plans.map((plan, index) => (
-                            <div
-                                key={index}
-                                onClick={() => openPlanModal(plan)}
-                                className="bg-white p-6 rounded-lg shadow-lg hover:bg-green-200 cursor-pointer transition-all duration-300"
-                            >
-                                <h3 className="text-2xl font-semibold mb-2">{plan.name}</h3>
-                                <p className="text-gray-700">{plan.description}</p>
-                                <p className="text-gray-500">Objętość: {plan.volume}</p>
-                            </div>
-                        ))}
-                    </div>
+                {/* Kategorie */}
+                <div className="flex justify-center flex-wrap gap-6 mb-10">
+                    {(selectedSection === 'Ćwiczenia' ? exerciseCategories : supplementCategories).map((category, index) => (
+                        <CategoryCard
+                            key={index}
+                            category={category}
+                            isSelected={selectedCategory === category}
+                            onClick={handleCategoryClick}
+                        />
+                    ))}
                 </div>
 
-                {/* Modal z planem treningowym */}
-                {showModal && selectedPlan && (
-                    <ModalGuides closeModal={closeModal}>
-                        <h2 className="text-3xl font-bold mb-4">{selectedPlan.name}</h2>
-                        <p className="text-gray-700 mb-4">{selectedPlan.description}</p>
-                        <p className="text-gray-700 mb-4">Dla kogo: {selectedPlan.target}</p>
-                        <p className="text-gray-500 mb-4">Objętość: {selectedPlan.volume}</p>
-                        <div className="mb-4">
-                            {Object.keys(selectedPlan.days).map((day, index) => (
-                                <div key={index} className="mb-4">
-                                    <h4 className="text-xl font-bold">{day}</h4>
-                                    <ul className="list-disc ml-5">
-                                        {selectedPlan.days[day].map((exercise, idx) => (
-                                            <li key={idx} className="text-lg">{exercise.exercise} - {exercise.sets} serie, {exercise.reps} powtórzenia</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
-                        </div>
-                    </ModalGuides>
-                )}
+                {/* Lista elementów */}
+                <ItemList items={filteredItems} onItemSelect={openItemDetails} />
 
-                {/* Modal z ćwiczeniem */}
-                {showModal && selectedExercise && (
-                    <ModalGuides closeModal={closeModal}>
-                        <h2 className="text-3xl font-bold mb-4">{selectedExercise.name}</h2>
-                        <p className="text-gray-700 mb-4">{selectedExercise.description}</p>
-                    </ModalGuides>
+                {/* Modal z detalami */}
+                {showModal && selectedItem && (
+                    <ItemsDetailsModal item={selectedItem} closeModal={closeModal} />
                 )}
             </div>
         </LayoutDefaultUser>

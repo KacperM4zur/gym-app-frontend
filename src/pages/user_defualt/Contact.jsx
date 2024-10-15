@@ -1,5 +1,5 @@
 import LayoutDefaultUser from "../../components/user_defualt/LayoutDefaultUser.jsx";
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const Contact = () => {
     // State for handling form input
@@ -24,8 +24,9 @@ const Contact = () => {
         <LayoutDefaultUser>
             <div className="flex flex-col min-h-full bg-gray-50">
                 {/* Header Section */}
-                <div className="bg-gray-700 text-white py-6 text-center">
-                    <h1 className="text-3xl font-bold">Masz pytanie? Skontaktuj się z nami!</h1>
+                <div className="bg-gray-700 text-white py-8 text-center">
+                    <h1 className="text-3xl font-bold mb-2">Kontakt</h1>
+                    <p className="text-lg mb-6">Masz pytanie? Skontaktuj się z nami!</p>
                 </div>
 
                 {/* Main Content */}
