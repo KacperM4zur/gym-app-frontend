@@ -1,32 +1,38 @@
 import React from 'react';
 
-const ProgressDetails = ({ progress }) => {
+const ProgressDetails = ({ progressData, notes }) => {
     return (
-        <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-4">Postępy Klienta</h2>
-            {progress.length === 0 ? (
-                <p className="text-gray-600">Brak zapisanych postępów.</p>
-            ) : (
-                <table className="w-full bg-white shadow-md rounded-lg">
-                    <thead>
-                    <tr className="bg-blue-500 text-white">
-                        <th className="p-3">Data</th>
-                        <th className="p-3">Waga (kg)</th>
-                        <th className="p-3">Wyciskanie (kg)</th>
-                        <th className="p-3">Przysiady (kg)</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {progress.map((entry, index) => (
-                        <tr key={index} className="border-b">
-                            <td className="p-3">{entry.date}</td>
-                            <td className="p-3">{entry.weight}</td>
-                            <td className="p-3">{entry.benchPress}</td>
-                            <td className="p-3">{entry.squat}</td>
-                        </tr>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4">Historia Postępów</h2>
+
+            <div className="mb-6">
+                <h3 className="text-xl font-semibold">Dane z monitoringu:</h3>
+                {progressData.length > 0 ? (
+                    <ul className="space-y-4">
+                        {progressData.map((progress, index) => (
+                            <li key={index} className="p-4 border rounded-lg bg-gray-100">
+                                <strong>Data:</strong> {progress.date} <br />
+                                <strong>Waga:</strong> {progress.weight} kg <br />
+                                <strong>Notatka:</strong> {progress.note}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>Brak zapisanych postępów dla tego klienta.</p>
+                )}
+            </div>
+
+            <h3 className="text-xl font-semibold">Notatki:</h3>
+            {notes.length > 0 ? (
+                <ul className="space-y-4">
+                    {notes.map((note) => (
+                        <li key={note.id} className="p-4 border rounded-lg bg-gray-100">
+                            {note.content}
+                        </li>
                     ))}
-                    </tbody>
-                </table>
+                </ul>
+            ) : (
+                <p>Brak zapisanych notatek dla tego klienta.</p>
             )}
         </div>
     );

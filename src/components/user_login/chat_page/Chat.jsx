@@ -1,45 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const Chat = ({ trainerId, closeChat }) => {
-    const [messages, setMessages] = useState([]);
+const Chat = ({ messages, addMessage }) => {
     const [newMessage, setNewMessage] = useState('');
 
-    const handleSendMessage = (e) => {
-        e.preventDefault();
-        const message = {
-            id: Date.now(),
-            content: newMessage,
-            author: 'Użytkownik',
-            timestamp: new Date().toLocaleTimeString()
-        };
-        setMessages([...messages, message]);
-        setNewMessage('');
+    const handleSend = () => {
+        if (newMessage.trim()) {
+            addMessage(newMessage);
+            setNewMessage(''); // Reset pola po wysłaniu
+        }
     };
 
     return (
-        <div className="bg-white shadow-lg rounded-lg p-6">
-            <button onClick={closeChat} className="text-red-500 float-right">Zamknij</button>
-            <h2 className="text-2xl font-bold mb-4">Czat z trenerem {trainerId}</h2>
-            <div className="chat-box h-64 overflow-y-scroll border p-4 mb-4">
-                {messages.map((msg, index) => (
-                    <div key={index} className={`mb-2 ${msg.author === 'Użytkownik' ? 'text-right' : 'text-left'}`}>
-                        <span className="font-bold">{msg.author}</span>: {msg.content}
-                        <div className="text-xs text-gray-500">{msg.timestamp}</div>
+        <div className="bg-gray-100 p-4 rounded-lg">
+            <div className="h-64 overflow-y-scroll mb-4">
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`mb-2 ${msg.sender === 'User' ? 'text-right' : ''}`}>
+                        <span className="font-bold">{msg.sender}: </span>
+                        <span>{msg.content}</span>
                     </div>
                 ))}
             </div>
-            <form onSubmit={handleSendMessage}>
+
+            <div className="flex">
                 <input
                     type="text"
-                    placeholder="Napisz wiadomość..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    className="w-full p-2 mb-2 border rounded"
+                    placeholder="Napisz wiadomość..."
+                    className="flex-grow p-2 border rounded-lg"
                 />
-                <button className="bg-green-500 text-white px-4 py-2 rounded" type="submit">
+                <button
+                    onClick={handleSend}
+                    className="ml-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
+                >
                     Wyślij
                 </button>
-            </form>
+            </div>
         </div>
     );
 };
