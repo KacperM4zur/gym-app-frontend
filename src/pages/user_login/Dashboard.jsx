@@ -4,7 +4,7 @@ import TrainingPlanCard from "../../components/user_login/dashboard_page/Trainin
 import SupplementPlanCard from "../../components/user_login/dashboard_page/SupplementPlanCard.jsx";
 import WeightProgressChart from "../../components/user_login/dashboard_page/WeightProgressChart.jsx";
 import StrengthProgressChart from "../../components/user_login/dashboard_page/StrengthProgressChart.jsx";
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
+
 
 const Dashboard = () => {
     const [currentDay, setCurrentDay] = useState('');
