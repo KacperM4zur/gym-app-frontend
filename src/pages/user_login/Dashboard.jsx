@@ -1,21 +1,23 @@
-// pages/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import 'chart.js/auto';
-import {ChevronDownIcon, ChevronUpIcon} from "@heroicons/react/16/solid/index.js";
+import InfoCard from "../../components/user_login/dashboard_page/InfoCard.jsx";
+import TrainingPlanCard from "../../components/user_login/dashboard_page/TrainingPlanCard.jsx";
+import SupplementPlanCard from "../../components/user_login/dashboard_page/SupplementPlanCard.jsx";
+import WeightProgressChart from "../../components/user_login/dashboard_page/WeightProgressChart.jsx";
+import StrengthProgressChart from "../../components/user_login/dashboard_page/StrengthProgressChart.jsx";
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
 
 const Dashboard = () => {
     const [currentDay, setCurrentDay] = useState('');
     const [trainingToday, setTrainingToday] = useState([]);
     const [supplementsToday, setSupplementsToday] = useState([]);
-    const [weightHistory, setWeightHistory] = useState([75, 74, 73, 72, 71]);  // Historia wagi (kg)
-    const [strengthProgress, setStrengthProgress] = useState({
+    const [isWeightDetailsVisible, setIsWeightDetailsVisible] = useState(false);
+    const [isStrengthDetailsVisible, setIsStrengthDetailsVisible] = useState(false);
+    const weightHistory = [75, 74, 73, 72, 71];
+    const strengthProgress = {
         squat: [100, 110, 120, 130],
         deadlift: [120, 130, 140, 150],
         benchPress: [80, 85, 90, 95],
-    });
-    const [isWeightDetailsVisible, setIsWeightDetailsVisible] = useState(false);
-    const [isStrengthDetailsVisible, setIsStrengthDetailsVisible] = useState(false);
+    };
 
     const trainingPlan = {
         'Poniedziałek': ['Przysiady', 'Wyciskanie na ławce', 'Podciąganie'],
@@ -34,123 +36,82 @@ const Dashboard = () => {
     useEffect(() => {
         const today = new Date();
         const days = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
-        const currentDay = days[today.getDay()];
-        setCurrentDay(currentDay);
-
-        setTrainingToday(trainingPlan[currentDay] || []);
-        setSupplementsToday(supplementPlan[currentDay] || []);
+        setCurrentDay(days[today.getDay()]);
+        setTrainingToday(trainingPlan[days[today.getDay()]] || []);
+        setSupplementsToday(supplementPlan[days[today.getDay()]] || []);
     }, []);
-
-    // Dane do wykresu wagi
-    const weightData = {
-        labels: ['Tydzień 1', 'Tydzień 2', 'Tydzień 3', 'Tydzień 4', 'Tydzień 5'],
-        datasets: [
-            {
-                label: 'Waga (kg)',
-                data: weightHistory,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                tension: 0.4,
-            },
-        ],
-    };
-
-    // Dane do wykresu siłowego
-    const strengthData = {
-        labels: ['Tydzień 1', 'Tydzień 2', 'Tydzień 3', 'Tydzień 4'],
-        datasets: [
-            {
-                label: 'Przysiad (kg)',
-                data: strengthProgress.squat,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                tension: 0.4,
-            },
-            {
-                label: 'Martwy ciąg (kg)',
-                data: strengthProgress.deadlift,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                tension: 0.4,
-            },
-            {
-                label: 'Wyciskanie na ławce (kg)',
-                data: strengthProgress.benchPress,
-                borderColor: 'rgba(255, 206, 86, 1)',
-                backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                tension: 0.4,
-            },
-        ],
-    };
 
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-5xl font-bold mb-6 text-center">Panel główny</h1>
 
-            {/* Kafelek treningu na dzisiaj */}
-            <div className="mb-8 bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h2 className="text-2xl font-semibold mb-4">Trening na dziś ({currentDay})</h2>
-                {trainingToday.length > 0 ? (
-                    <ul className="list-disc list-inside">
-                        {trainingToday.map((exercise, index) => (
-                            <li key={index} className="mb-2">{exercise}</li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-600">Brak zaplanowanych treningów na dzisiaj.</p>
-                )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <InfoCard title="Treningi na dziś" value={trainingToday.length} description="Zaplanuj swój dzień" />
+                <InfoCard title="Suplementacja na dziś" value={supplementsToday.length} description="Pamiętaj o suplementach" />
+                <InfoCard title="Waga" value={`${weightHistory[weightHistory.length - 1]} kg`} description="Ostatni pomiar wagi" />
+                <InfoCard title="Postęp siłowy" value="3 ćwiczenia" description="Wzrost siły" />
             </div>
 
-            {/* Kafelek suplementów na dzisiaj */}
-            <div className="mb-8 bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <h2 className="text-2xl font-semibold mb-4">Suplementy na dziś</h2>
-                {supplementsToday.length > 0 ? (
-                    <ul className="list-disc list-inside">
-                        {supplementsToday.map((supplement, index) => (
-                            <li key={index} className="mb-2">{supplement}</li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-600">Brak suplementów na dzisiaj.</p>
-                )}
+            {/* Trening i Suplementacja na dziś */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <TrainingPlanCard currentDay={currentDay} trainingToday={trainingToday} />
+                <SupplementPlanCard currentDay={currentDay} supplementsToday={supplementsToday} />
             </div>
 
-            {/* Wykres wagi z możliwością rozwijania */}
-            <div className="mb-8 bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold">Postęp wagi</h2>
-                    <button onClick={() => setIsWeightDetailsVisible(!isWeightDetailsVisible)}>
-                        {isWeightDetailsVisible ? (
-                            <ChevronUpIcon className="w-6 h-6 text-gray-500" />
-                        ) : (
-                            <ChevronDownIcon className="w-6 h-6 text-gray-500" />
-                        )}
-                    </button>
-                </div>
-                {isWeightDetailsVisible && <Line data={weightData} />}
-            </div>
-
-            {/* Wykres siłowy z możliwością rozwijania */}
-            <div className="mb-8 bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold">Postęp siłowy</h2>
-                    <button onClick={() => setIsStrengthDetailsVisible(!isStrengthDetailsVisible)}>
-                        {isStrengthDetailsVisible ? (
-                            <ChevronUpIcon className="w-6 h-6 text-gray-500" />
-                        ) : (
-                            <ChevronDownIcon className="w-6 h-6 text-gray-500" />
-                        )}
-                    </button>
-                </div>
-                {isStrengthDetailsVisible && <Line data={strengthData} />}
+            {/* Wykres postępu */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <WeightProgressChart
+                    isWeightDetailsVisible={isWeightDetailsVisible}
+                    weightData={{
+                        labels: ['Tydzień 1', 'Tydzień 2', 'Tydzień 3', 'Tydzień 4', 'Tydzień 5'],
+                        datasets: [
+                            {
+                                label: 'Waga (kg)',
+                                data: weightHistory,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.4,
+                            },
+                        ],
+                    }}
+                    toggleDetails={() => setIsWeightDetailsVisible(!isWeightDetailsVisible)}
+                />
+                <StrengthProgressChart
+                    isStrengthDetailsVisible={isStrengthDetailsVisible}
+                    strengthData={{
+                        labels: ['Tydzień 1', 'Tydzień 2', 'Tydzień 3', 'Tydzień 4'],
+                        datasets: [
+                            {
+                                label: 'Przysiad (kg)',
+                                data: strengthProgress.squat,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                tension: 0.4,
+                            },
+                            {
+                                label: 'Martwy ciąg (kg)',
+                                data: strengthProgress.deadlift,
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                tension: 0.4,
+                            },
+                            {
+                                label: 'Wyciskanie na ławce (kg)',
+                                data: strengthProgress.benchPress,
+                                borderColor: 'rgba(255, 206, 86, 1)',
+                                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                tension: 0.4,
+                            },
+                        ],
+                    }}
+                    toggleDetails={() => setIsStrengthDetailsVisible(!isStrengthDetailsVisible)}
+                />
             </div>
 
             {/* Motywacyjny cytat */}
-            <div className="mb-8 text-center">
+            <div className="bg-gray-200 p-6 rounded-lg shadow-md text-center">
                 <h2 className="text-2xl font-semibold mb-4">Motywacyjny cytat dnia</h2>
-                <p className="text-xl text-gray-700 italic">
-                    "Nie ma skrótu do miejsca, do którego warto dotrzeć."
-                </p>
+                <p className="text-xl text-gray-700 italic">"Nie ma skrótu do miejsca, do którego warto dotrzeć."</p>
             </div>
         </div>
     );
