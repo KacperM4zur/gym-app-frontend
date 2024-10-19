@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SavedPlans = ({ plans, selectedClientId }) => {
+const SavedPlans = ({ plans, selectedClientId, onDelete }) => {
     const clientPlans = plans.filter(plan => plan.clientId === selectedClientId);  // Filtrujemy plany dla wybranego klienta
 
     return (
@@ -22,6 +22,12 @@ const SavedPlans = ({ plans, selectedClientId }) => {
                                 </ul>
                             </div>
                         ))}
+                        <button
+                            onClick={() => onDelete(plan.id)}
+                            className="bg-red-500 text-white px-4 py-2 mt-2 rounded-lg hover:bg-red-600 transition duration-300"
+                        >
+                            Usuń plan
+                        </button>
                     </div>
                 ))
             ) : (

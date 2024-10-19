@@ -1,27 +1,34 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Line } from 'react-chartjs-2';
+import '../../chartSetup.js';
 
-const progressData = [
-    { date: '2024-09-01', weight: 50 },
-    { date: '2024-09-10', weight: 55 },
-    { date: '2024-09-15', weight: 60 },
-    { date: '2024-09-20', weight: 65 },
-    { date: '2024-09-25', weight: 70 },
-];
+const ProgressChart = ({ data, label }) => {
+    const chartData = {
+        labels: data.map(entry => entry.date),
+        datasets: [
+            {
+                label: 'Postęp',
+                data: data.map(entry => entry.value),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.4,
+            },
+        ],
+    };
 
-const ProgressChart = () => {
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        },
+    };
+
     return (
-        <div className="bg-gray-200 p-6 rounded-lg shadow-lg">
-            <h2 className="text-3xl font-bold mb-4">Wykres Postępów (Przysiady)</h2>
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={progressData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis dataKey="weight" />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="weight" stroke="#8884d8" strokeWidth={2} />
-                </LineChart>
-            </ResponsiveContainer>
+        <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">{label}</h3>
+            <Line data={chartData} options={options} />
         </div>
     );
 };

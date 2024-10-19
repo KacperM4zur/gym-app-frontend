@@ -39,7 +39,6 @@ const ProgressTracking = () => {
         }));
     };
 
-    // Funkcja dodawania nowych notatek
     const handleAddNote = (clientId, newNote) => {
         setNotes((prevNotes) => ({
             ...prevNotes,
@@ -49,11 +48,12 @@ const ProgressTracking = () => {
 
     return (
         <div className="container mx-auto p-6">
-            <div className="grid grid-cols-4 gap-4">
-                <div>
+            <h1 className="text-5xl font-bold mb-6 text-center">Monitorowanie Postępów</h1>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-1">
                     <ClientList clients={clients} onSelect={handleClientSelect} selectedClientId={selectedClientId} />
                 </div>
-                <div className="col-span-3">
+                <div className="md:col-span-2">
                     {selectedClientId ? (
                         <>
                             <ProgressDetails
@@ -65,7 +65,7 @@ const ProgressTracking = () => {
                             <AddNoteForm clientId={selectedClientId} onAddNote={handleAddNote} />
                         </>
                     ) : (
-                        <div className="text-center">
+                        <div className="text-center bg-white shadow-md rounded-lg p-6">
                             <p>Wybierz klienta, aby wyświetlić jego postęp.</p>
                         </div>
                     )}
