@@ -9,15 +9,35 @@ const Contact = () => {
         message: '',
     });
 
+    const [responseMessage, setResponseMessage] = useState('');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission logic here
-        console.log('Form submitted:', formData);
+
+        try {
+            const response = await fetch('http://gym-app.test/api/contact-messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setResponseMessage('Wiadomość została wysłana pomyślnie.');
+            } else {
+                setResponseMessage('Wystąpił błąd: ' + (data.errors ? JSON.stringify(data.errors) : data.message));
+            }
+        } catch (error) {
+            setResponseMessage('Wystąpił błąd podczas wysyłania wiadomości.');
+        }
     };
 
     return (
@@ -86,12 +106,19 @@ const Contact = () => {
                             >
                                 Wyślij
                             </button>
+
+                            {/* Response Message */}
+                            {responseMessage && (
+                                <div className="mt-4 text-center text-red-500">
+                                    {responseMessage}
+                                </div>
+                            )}
                         </form>
                     </div>
                 </div>
             </div>
         </LayoutDefaultUser>
     );
-}
+};
 
 export default Contact;
