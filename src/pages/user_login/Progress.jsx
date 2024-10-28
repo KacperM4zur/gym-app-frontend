@@ -25,20 +25,35 @@ const Progress = () => {
     const bodyParts = ['Klatka piersiowa', 'Plecy', 'Nogi', 'Ramiona'];
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-4xl font-bold mb-6">Monitorowanie Postępów</h1>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
+        <div className="container mx-auto p-4 sm:p-6 bg-gray-50 rounded-lg">
+            <h1 className="text-4xl font-bold mb-6 text-center">Monitorowanie Postępów</h1>
+            <div className="grid grid-cols-1 gap-6">
+                <div className="p-4 bg-white rounded-lg shadow-md">
                     <ExerciseForm onAddExercise={addExercise} />
-                    <ProgressChart data={exerciseData} label="Maksymalne Obciążenia" filterOptions={exerciseOptions} filterBy="exercise" />
+                    <ProgressChart
+                        data={exerciseData}
+                        label="Maksymalne Obciążenia"
+                        filterOptions={exerciseOptions}
+                        filterBy="exercise"
+                    />
                 </div>
-                <div>
+                <div className="p-4 bg-white rounded-lg shadow-md">
                     <WeightForm onAddWeight={addWeight} />
-                    <ProgressChart data={weightData} label="Waga" filterOptions={['Waga']} filterBy="weight" />
+                    <ProgressChart
+                        data={weightData}
+                        label="Waga"
+                        filterOptions={['Waga']}
+                        filterBy="weight"
+                    />
                 </div>
-                <div className="col-span-2">
+                <div className="p-4 bg-white rounded-lg shadow-md">
                     <MeasurementForm onAddMeasurement={addMeasurement} />
-                    <ProgressChart data={measurementData} label="Pomiary ciała" filterOptions={bodyParts} filterBy="part" />
+                    <ProgressChart
+                        data={measurementData}
+                        label="Pomiary ciała"
+                        filterOptions={bodyParts}
+                        filterBy="part"
+                    />
                 </div>
             </div>
         </div>

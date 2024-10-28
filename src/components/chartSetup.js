@@ -9,7 +9,7 @@ import {
     Legend,
 } from 'chart.js';
 
-// Rejestracja wymaganych komponentów do Chart.js
+// Register required components for Chart.js
 ChartJS.register(
     CategoryScale,
     LinearScale,
