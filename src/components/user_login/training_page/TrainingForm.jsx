@@ -20,6 +20,14 @@ const TrainingForm = ({ currentExercise, handleExerciseChange, addExercise, setS
                 </select>
                 <input
                     type="number"
+                    name="weight"
+                    placeholder="Waga"
+                    value={currentExercise.weight}
+                    onChange={handleExerciseChange}
+                    className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                    type="number"
                     name="sets"
                     placeholder="Serie"
                     value={currentExercise.sets}

@@ -1,47 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DaySelectionTraining from "../../components/user_login/training_page/DaySelectionTraining.jsx";
 import TrainingForm from "../../components/user_login/training_page/TrainingForm.jsx";
 import TrainingSummary from "../../components/user_login/training_page/TrainingSummary.jsx";
 import SavedTrainingPlans from "../../components/user_login/training_page/SavedTrainingPlans.jsx";
 
 const Training = () => {
-    const [step, setStep] = useState(1);  // Krok kreatora
-    const [selectedDay, setSelectedDay] = useState('');  // Wybrany dzień
-    const [trainingPlan, setTrainingPlan] = useState({});  // Plan treningowy dla dni
-    const [currentExercise, setCurrentExercise] = useState({ exercise: '', sets: '', reps: '', rest: '' });  // Aktualne ćwiczenie
-    const [savedPlans, setSavedPlans] = useState([
-        {
-            name: 'Trening siłowy A',
-            days: {
-                'Poniedziałek': [
-                    { exercise: 'Przysiady', sets: '4', reps: '12', rest: '1 min' },
-                    { exercise: 'Martwy ciąg', sets: '3', reps: '10', rest: '2 min' },
-                ],
-                'Wtorek': [
-                    { exercise: 'Wyciskanie na ławce', sets: '4', reps: '10', rest: '1.5 min' },
-                    { exercise: 'Podciąganie', sets: '3', reps: '8', rest: '2 min' },
-                ],
-            }
-        },
-        {
-            name: 'Trening funkcjonalny',
-            days: {
-                'Środa': [
-                    { exercise: 'Plank', sets: '3', reps: '1 min', rest: '2 min' },
-                    { exercise: 'Wiosłowanie hantlami', sets: '4', reps: '12', rest: '1.5 min' },
-                ]
-            }
-        },
-    ]);
-    const [planName, setPlanName] = useState('');  // Nazwa planu
-    const [isPlanNameSet, setIsPlanNameSet] = useState(false);  // Czy nazwa planu została ustawiona
+    const [step, setStep] = useState(1);
+    const [selectedDay, setSelectedDay] = useState('');
+    const [trainingPlan, setTrainingPlan] = useState({});
+    const [currentExercise, setCurrentExercise] = useState({ exercise: '', sets: '', reps: '', rest: '' });
+    const [savedPlans, setSavedPlans] = useState([]);
+    const [planName, setPlanName] = useState('');
+    const [isPlanNameSet, setIsPlanNameSet] = useState(false);
+    const [daysOfWeek, setDaysOfWeek] = useState([]);
+    const [exerciseOptions, setExerciseOptions] = useState([]);
 
-    const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
-    const exerciseOptions = ['Przysiady', 'Martwy ciąg', 'Wyciskanie na ławce', 'Podciąganie', 'Plank'];
+    // Helper function to fetch API data with Authorization header
+    const fetchWithAuth = async (url, options = {}) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            options.headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`,
+            };
+        }
+        const response = await fetch(url, options);
+        return response.json();
+    };
+
+    // Fetch days and exercises when component mounts
+    useEffect(() => {
+        const fetchDaysAndExercises = async () => {
+            try {
+                const daysData = await fetchWithAuth("http://gym-app.test/api/days");
+                setDaysOfWeek(daysData.data.map(day => day.name));
+
+                const exercisesData = await fetchWithAuth("http://gym-app.test/api/exercises");
+                setExerciseOptions(exercisesData.map(exercise => exercise.name));
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchDaysAndExercises();
+    }, []);
 
     const selectDay = (day) => {
         setSelectedDay(day);
-        setStep(2);  // Przejście do następnego kroku
+        setStep(2);
     };
 
     const handleExerciseChange = (e) => {
@@ -59,21 +64,52 @@ const Training = () => {
                 [selectedDay]: [...(prev[selectedDay] || []), currentExercise],
             }));
             setCurrentExercise({ exercise: '', sets: '', reps: '', rest: '' });
-            setStep(1);  // Powrót do wyboru dnia
+            setStep(1);
         }
     };
 
-    const savePlan = () => {
+    const savePlan = async () => {
         if (planName && Object.keys(trainingPlan).length > 0) {
-            setSavedPlans((prevPlans) => [
-                ...prevPlans,
-                { name: planName, days: trainingPlan }
-            ]);
-            setTrainingPlan({});
-            setPlanName('');
-            setStep(1);
-            setIsPlanNameSet(false);  // Reset po zapisaniu planu
-            console.log('Zapisany plan treningowy:', { planName, trainingPlan });
+            try {
+                // Przygotowanie struktury workoutPlanData zgodnie z oczekiwaniami API
+                const workoutPlanData = {
+                    workoutPlanName: planName,
+                    plan: Object.entries(trainingPlan).map(([day, exercises]) => ({
+                        day_of_week: daysOfWeek.indexOf(day) + 1, // Zamień dzień na indeks (1 dla Poniedziałku, itd.)
+                        exercises: exercises.map(exercise => ({
+                            exercise_id: exercise.exercise_id || 1, // Jeśli brakuje exercise_id, podaj przykładową wartość
+                            sets: parseInt(exercise.sets),
+                            reps: parseInt(exercise.reps),
+                            break: parseInt(exercise.rest),
+                            weight: parseFloat(exercise.weight || 0) // Zakładamy wagę jako 0 jeśli brak wartości
+                        }))
+                    }))
+                };
+
+                const response = await fetchWithAuth("http://gym-app.test/api/create-workout-plan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ workoutPlan: workoutPlanData }),
+                });
+
+                if (response.status === 200) {
+                    console.log("Plan saved successfully:", response);
+                    setSavedPlans((prevPlans) => [
+                        ...prevPlans,
+                        { name: planName, days: trainingPlan },
+                    ]);
+                    setTrainingPlan({});
+                    setPlanName('');
+                    setStep(1);
+                    setIsPlanNameSet(false);
+                } else {
+                    console.error("Failed to save plan:", response);
+                }
+            } catch (error) {
+                console.error("Error saving plan:", error);
+            }
         }
     };
 
@@ -87,11 +123,9 @@ const Training = () => {
         <div className="container mx-auto p-6">
             <h1 className="text-5xl font-bold mb-6 text-center text-gray-900">Kreator Planu Treningowego</h1>
 
-            {/* Sekcja zapisanych planów */}
             <SavedTrainingPlans plans={savedPlans} />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-                {/* Wybór dni */}
                 <div className="col-span-1">
                     <DaySelectionTraining
                         daysOfWeek={daysOfWeek}
@@ -101,7 +135,6 @@ const Training = () => {
                 </div>
 
                 <div className="col-span-3">
-                    {/* Wyświetl pole nazwy planu tylko raz, przed dodawaniem ćwiczeń */}
                     {!isPlanNameSet && (
                         <div className="mb-6">
                             <label className="block text-gray-700 font-semibold mb-2">Nazwa planu</label>
@@ -121,7 +154,6 @@ const Training = () => {
                         </div>
                     )}
 
-                    {/* Formularz dodawania ćwiczeń */}
                     {isPlanNameSet && step === 2 && (
                         <TrainingForm
                             currentExercise={currentExercise}
@@ -133,17 +165,15 @@ const Training = () => {
                         />
                     )}
 
-                    {/* Podsumowanie planu */}
                     {isPlanNameSet && (
                         <>
                             <TrainingSummary daysOfWeek={daysOfWeek} trainingPlan={trainingPlan} />
 
-                            {/* Przycisk zapisu planu */}
                             <div className="flex justify-center mt-10">
                                 <button
                                     onClick={savePlan}
                                     className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-105 mt-6"
-                                    style={{ marginBottom: "80px" }}  // Przesunięcie przycisku
+                                    style={{ marginBottom: "80px" }}
                                 >
                                     Zapisz plan
                                 </button>
