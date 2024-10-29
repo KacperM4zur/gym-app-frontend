@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const SavedTrainingPlans = ({ plans }) => {
+const SavedTrainingPlans = ({ plans, exerciseOptions }) => {
     const [expandedPlan, setExpandedPlan] = useState(null);
+
+    useEffect(() => {
+        console.log("Received exerciseOptions:", exerciseOptions); // Debug log
+    }, [exerciseOptions]);
 
     const togglePlan = (index) => {
         setExpandedPlan(expandedPlan === index ? null : index);
     };
+
+    const getExerciseName = (exerciseName) => {
+        // Sprawdzamy, czy `exerciseName` jest w `exerciseOptions`
+        return exerciseOptions.includes(exerciseName) ? exerciseName : 'Nieznane ćwiczenie';
+    };
+
+    if (!exerciseOptions || exerciseOptions.length === 0) {
+        return <div>Ładowanie danych ćwiczeń...</div>;
+    }
 
     return (
         <div className="mb-6">
@@ -32,13 +45,13 @@ const SavedTrainingPlans = ({ plans }) => {
                     </div>
                     {expandedPlan === index && (
                         <div className="mt-4">
-                            {Object.entries(plan.days).map(([day, exercises], i) => (
+                            {plan.plan.map((dayPlan, i) => (
                                 <div key={i} className="mb-4">
-                                    <h4 className="font-semibold">{day}</h4>
+                                    <h4 className="font-semibold">{dayPlan.day}</h4>
                                     <ul className="list-disc list-inside">
-                                        {exercises.map((exercise, j) => (
+                                        {dayPlan.exercises.map((exercise, j) => (
                                             <li key={j}>
-                                                {exercise.exercise} - Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Przerwa: {exercise.rest}
+                                                {getExerciseName(exercise.name)} - Waga: {exercise.weight}, Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Przerwa: {exercise.break || exercise.rest}
                                             </li>
                                         ))}
                                     </ul>

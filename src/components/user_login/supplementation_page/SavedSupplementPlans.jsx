@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const SavedSupplementPlans = ({ plans }) => {
+const SavedSupplementPlans = ({ plans, supplementOptions }) => {
     const [expandedPlan, setExpandedPlan] = useState(null);
+
+    useEffect(() => {
+        console.log("Received supplementOptions:", supplementOptions); // Debug log
+    }, [supplementOptions]);
 
     const togglePlan = (index) => {
         setExpandedPlan(expandedPlan === index ? null : index);
     };
+
+    const getSupplementName = (supplementName) => {
+        // Sprawdzamy, czy `supplementName` jest w `supplementOptions`
+        return supplementOptions.some(supplement => supplement.name === supplementName)
+            ? supplementName
+            : 'Nieznany suplement';
+    };
+
+    if (!supplementOptions || supplementOptions.length === 0) {
+        return <div>Ładowanie danych suplementów...</div>;
+    }
 
     return (
         <div className="mb-6">
@@ -32,13 +47,13 @@ const SavedSupplementPlans = ({ plans }) => {
                     </div>
                     {expandedPlan === index && (
                         <div className="mt-4">
-                            {Object.entries(plan.days).map(([day, supplements], i) => (
+                            {plan.plan.map((dayPlan, i) => (
                                 <div key={i} className="mb-4">
-                                    <h4 className="font-semibold">{day}</h4>
+                                    <h4 className="font-semibold">{dayPlan.day}</h4>
                                     <ul className="list-disc list-inside">
-                                        {supplements.map((supplement, j) => (
+                                        {dayPlan.supplements.map((supplement, j) => (
                                             <li key={j}>
-                                                {supplement.name} - {supplement.amount} - {supplement.time}
+                                                {getSupplementName(supplement.name)} - {supplement.amount} {supplement.unit}
                                             </li>
                                         ))}
                                     </ul>

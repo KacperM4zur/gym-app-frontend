@@ -28,20 +28,26 @@ const Training = () => {
         return response.json();
     };
 
-    // Fetch days and exercises when component mounts
+    // Fetch days, exercises, and saved plans when component mounts
     useEffect(() => {
-        const fetchDaysAndExercises = async () => {
+        const fetchInitialData = async () => {
             try {
                 const daysData = await fetchWithAuth("http://gym-app.test/api/days");
+                console.log("Loaded days data:", daysData);
                 setDaysOfWeek(daysData.data.map(day => day.name));
 
                 const exercisesData = await fetchWithAuth("http://gym-app.test/api/exercises");
+                console.log("Loaded exercises data:", exercisesData);
                 setExerciseOptions(exercisesData.map(exercise => exercise.name));
+
+                const savedPlansData = await fetchWithAuth("http://gym-app.test/api/user-workout-plans");
+                console.log("Loaded saved plans data:", savedPlansData);
+                setSavedPlans(savedPlansData.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchDaysAndExercises();
+        fetchInitialData();
     }, []);
 
     const selectDay = (day) => {
@@ -71,17 +77,16 @@ const Training = () => {
     const savePlan = async () => {
         if (planName && Object.keys(trainingPlan).length > 0) {
             try {
-                // Przygotowanie struktury workoutPlanData zgodnie z oczekiwaniami API
                 const workoutPlanData = {
                     workoutPlanName: planName,
                     plan: Object.entries(trainingPlan).map(([day, exercises]) => ({
-                        day_of_week: daysOfWeek.indexOf(day) + 1, // Zamień dzień na indeks (1 dla Poniedziałku, itd.)
+                        day_of_week: daysOfWeek.indexOf(day) + 1,
                         exercises: exercises.map(exercise => ({
-                            exercise_id: exercise.exercise_id || 1, // Jeśli brakuje exercise_id, podaj przykładową wartość
+                            exercise_id: exercise.exercise_id || 1,  // Możliwe ID domyślne, dostosowane do rzeczywistości
                             sets: parseInt(exercise.sets),
                             reps: parseInt(exercise.reps),
                             break: parseInt(exercise.rest),
-                            weight: parseFloat(exercise.weight || 0) // Zakładamy wagę jako 0 jeśli brak wartości
+                            weight: parseFloat(exercise.weight || 0)
                         }))
                     }))
                 };
@@ -96,10 +101,20 @@ const Training = () => {
 
                 if (response.status === 200) {
                     console.log("Plan saved successfully:", response);
-                    setSavedPlans((prevPlans) => [
-                        ...prevPlans,
-                        { name: planName, days: trainingPlan },
-                    ]);
+                    const newPlan = {
+                        name: planName,
+                        plan: Object.entries(trainingPlan).map(([day, exercises]) => ({
+                            day,
+                            exercises: exercises.map(ex => ({
+                                name: ex.exercise,
+                                sets: ex.sets,
+                                reps: ex.reps,
+                                break: ex.rest,
+                            }))
+                        }))
+                    };
+
+                    setSavedPlans((prevPlans) => [...prevPlans, newPlan]);
                     setTrainingPlan({});
                     setPlanName('');
                     setStep(1);
@@ -113,6 +128,7 @@ const Training = () => {
         }
     };
 
+
     const handleSetPlanName = () => {
         if (planName) {
             setIsPlanNameSet(true);
@@ -123,7 +139,12 @@ const Training = () => {
         <div className="container mx-auto p-6">
             <h1 className="text-5xl font-bold mb-6 text-center text-gray-900">Kreator Planu Treningowego</h1>
 
-            <SavedTrainingPlans plans={savedPlans} />
+            {/* Komponent wyświetlający zapisane plany treningowe */}
+            {exerciseOptions.length > 0 ? (
+                <SavedTrainingPlans plans={savedPlans} exerciseOptions={exerciseOptions}/>
+            ) : (
+                <div>Ładowanie danych ćwiczeń...</div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
                 <div className="col-span-1">

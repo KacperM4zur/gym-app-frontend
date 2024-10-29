@@ -1,5 +1,5 @@
 import React from 'react';
-import {PlusCircleIcon, XCircleIcon} from "@heroicons/react/16/solid";
+import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/16/solid";
 
 const SupplementForm = ({
                             currentSupplement,
@@ -15,14 +15,14 @@ const SupplementForm = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <select
-                    name="name"
-                    value={currentSupplement.name}
+                    name="supplement_id" // Zmieniono na `supplement_id` zamiast `name`
+                    value={currentSupplement.supplement_id}
                     onChange={handleSupplementChange}
                     className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">Wybierz suplement</option>
                     {supplementOptions.map((supp) => (
-                        <option key={supp} value={supp}>{supp}</option>
+                        <option key={supp.id} value={supp.id}>{supp.name}</option> // Wyświetlamy `supp.name`, a wartość to `supp.id`
                     ))}
                 </select>
                 <input
@@ -35,9 +35,9 @@ const SupplementForm = ({
                 />
                 <input
                     type="text"
-                    name="time"
-                    placeholder="Kiedy (np. rano, po obiedzie)"
-                    value={currentSupplement.time}
+                    name="unit"
+                    placeholder="Jednostka (np. mg, ml, szt.)"
+                    value={currentSupplement.unit}
                     onChange={handleSupplementChange}
                     className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
