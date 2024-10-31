@@ -1,53 +1,47 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
-const ProgressChart = ({ data, label, filterOptions, filterBy }) => {
-    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
-    const groupedData = filterOptions.map((option, index) => ({
-        label: option,
-        data: data
-            .filter(entry => entry[filterBy] === option)
-            .map(entry => ({ x: entry.date, y: entry.value })),
-        borderColor: colors[index % colors.length],
-        backgroundColor: `${colors[index % colors.length]}33`,
-        tension: 0.4,
-    }));
-
+const ProgressChart = ({ data, label }) => {
     const chartData = {
-        datasets: groupedData
+        labels: data.map(entry => entry.date),
+        datasets: [
+            {
+                label: label,
+                data: data.map(entry => entry.weight),
+                fill: false,
+                borderColor: 'blue',
+                backgroundColor: 'blue',
+            },
+        ],
     };
 
     const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-                labels: { font: { size: 12 } },
-            },
-        },
         scales: {
-            x: {
-                type: 'category',
-                title: { display: true, text: 'Date', font: { size: 14 } }
-            },
             y: {
-                title: { display: true, text: 'Value', font: { size: 14 } }
+                title: {
+                    display: true,
+                    text: 'Waga (kg)', // Change this to 'Measurement (cm)' if used for body measurements
+                },
+                ticks: {
+                    callback: (value) => `${value} kg` // Adds "cm" next to each tick
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Data'
+                }
             }
-        },
+        }
     };
 
     return (
-        <div className="overflow-x-auto max-w-full">
-            <div className="min-w-[300px] md:min-w-full p-4 bg-white rounded-lg shadow-md">
-                <h3 className="text-xl font-semibold text-center mb-4">{label}</h3>
-                <div style={{ height: '250px' }}>
-                    <Line data={chartData} options={options} />
-                </div>
-            </div>
+        <div className="bg-white p-4 rounded-lg shadow-md mt-4">
+            <h3 className="text-lg font-bold">Historia wagi</h3>
+            <Line data={chartData} options={options} />
         </div>
     );
 };
