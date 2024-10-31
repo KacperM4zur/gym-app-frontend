@@ -44,7 +44,7 @@ const BodyPartChart = ({ data }) => {
     };
 
     return (
-        <div className="mt-8">
+        <div className="bg-white p-4 rounded-lg shadow-md mt-4">
             <h3 className="text-lg font-bold">Historia Pomiarów Ciała</h3>
             <Line data={chartData} options={options} />
         </div>

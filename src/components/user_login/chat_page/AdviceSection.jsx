@@ -1,20 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const AdviceSection = () => {
-    const adviceList = [
-        { id: 1, title: 'Trening na plecy', content: 'Pamiętaj, aby podczas martwego ciągu utrzymać proste plecy.' },
-        { id: 2, title: 'Dieta białkowa', content: 'Spożywaj białko po każdym treningu, aby wspomóc regenerację mięśni.' },
-    ];
+    const [advices, setAdvices] = useState([]);
+
+    useEffect(() => {
+        const fetchAdvices = async () => {
+            try {
+                const response = await fetch('http://gym-app.test/api/advices', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                if (data.status === 200) {
+                    setAdvices(data.data);
+                } else {
+                    console.error("Błąd pobierania porad:", data.message);
+                }
+            } catch (error) {
+                console.error("Błąd pobierania porad:", error);
+            }
+        };
+
+        fetchAdvices();
+    }, []);
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold mb-4">Porady</h3>
-            {adviceList.map((advice) => (
-                <div key={advice.id} className="mb-4">
-                    <h4 className="text-lg font-semibold">{advice.title}</h4>
-                    <p>{advice.content}</p>
-                </div>
-            ))}
+        <div className="p-4 bg-gray-100 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4">Twoje Porady</h2>
+            {advices.length > 0 ? (
+                <ul className="list-disc pl-5 space-y-2">
+                    {advices.map((advice) => (
+                        <li key={advice.id} className="text-gray-700">
+                            {advice.content}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-gray-500">Brak porad do wyświetlenia.</p>
+            )}
         </div>
     );
 };
