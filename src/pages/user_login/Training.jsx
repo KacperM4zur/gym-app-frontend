@@ -50,6 +50,31 @@ const Training = () => {
         fetchInitialData();
     }, []);
 
+    const deletePlan = async (planId) => {
+        if (!planId) {
+            console.error("Invalid plan ID:", planId);
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://gym-app.test/api/delete-workout-plan/${planId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                setSavedPlans((prevPlans) => prevPlans.filter(plan => plan.id !== planId));
+            } else {
+                console.error("Failed to delete plan");
+            }
+        } catch (error) {
+            console.error("Error deleting plan:", error);
+        }
+    };
     const selectDay = (day) => {
         setSelectedDay(day);
         setStep(2);
@@ -141,7 +166,7 @@ const Training = () => {
 
             {/* Komponent wyświetlający zapisane plany treningowe */}
             {exerciseOptions.length > 0 ? (
-                <SavedTrainingPlans plans={savedPlans} exerciseOptions={exerciseOptions}/>
+                <SavedTrainingPlans plans={savedPlans} onDelete={deletePlan} exerciseOptions={exerciseOptions}/>
             ) : (
                 <div>Ładowanie danych ćwiczeń...</div>
             )}

@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
 
-const SavedTrainingPlans = ({ plans, exerciseOptions }) => {
+const SavedTrainingPlans = ({ plans, exerciseOptions, onDelete }) => {
     const [expandedPlan, setExpandedPlan] = useState(null);
-
-    useEffect(() => {
-        console.log("Received exerciseOptions:", exerciseOptions); // Debug log
-    }, [exerciseOptions]);
+    const [planToDelete, setPlanToDelete] = useState(null);
 
     const togglePlan = (index) => {
         setExpandedPlan(expandedPlan === index ? null : index);
     };
 
     const getExerciseName = (exerciseName) => {
-        // Sprawdzamy, czy `exerciseName` jest w `exerciseOptions`
         return exerciseOptions.includes(exerciseName) ? exerciseName : 'Nieznane ćwiczenie';
     };
 
-    if (!exerciseOptions || exerciseOptions.length === 0) {
-        return <div>Ładowanie danych ćwiczeń...</div>;
-    }
+    const confirmDelete = (planId) => {
+        setPlanToDelete(planId);
+    };
+
+    const cancelDelete = () => {
+        setPlanToDelete(null);
+    };
+
+    const handleDelete = async () => {
+        await onDelete(planToDelete);
+        setPlanToDelete(null);
+    };
 
     return (
         <div className="mb-6">
@@ -57,10 +62,43 @@ const SavedTrainingPlans = ({ plans, exerciseOptions }) => {
                                     </ul>
                                 </div>
                             ))}
+                            {/* Przycisk usunięcia planu */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    confirmDelete(plan.id);
+                                }}
+                                className="text-red-500 hover:text-red-700 mt-4"
+                            >
+                                Usuń
+                            </button>
                         </div>
                     )}
                 </div>
             ))}
+
+            {/* Modal potwierdzenia usunięcia */}
+            {planToDelete && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Czy na pewno chcesz usunąć ten plan?</h2>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={cancelDelete}
+                                className="mr-4 px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                            >
+                                Usuń
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

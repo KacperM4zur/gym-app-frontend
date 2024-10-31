@@ -1,41 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const SavedSupplementPlans = ({ plans, supplementOptions }) => {
+const SavedSupplementPlans = ({ plans, onDelete }) => {
     const [expandedPlan, setExpandedPlan] = useState(null);
-
-    useEffect(() => {
-        console.log("Received supplementOptions:", supplementOptions); // Debug log
-    }, [supplementOptions]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [planToDelete, setPlanToDelete] = useState(null);
 
     const togglePlan = (index) => {
         setExpandedPlan(expandedPlan === index ? null : index);
     };
 
-    const getSupplementName = (supplementName) => {
-        // Sprawdzamy, czy `supplementName` jest w `supplementOptions`
-        return supplementOptions.some(supplement => supplement.name === supplementName)
-            ? supplementName
-            : 'Nieznany suplement';
+    const confirmDelete = (planId) => {
+        setPlanToDelete(planId);
+        setShowDeleteModal(true);
     };
 
-    if (!supplementOptions || supplementOptions.length === 0) {
-        return <div>Ładowanie danych suplementów...</div>;
-    }
+    const deletePlan = () => {
+        if (planToDelete !== null) {
+            onDelete(planToDelete);
+        }
+        closeDeleteModal();
+    };
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setPlanToDelete(null);
+    };
 
     return (
         <div className="mb-6">
             <h2 className="text-3xl font-bold mb-6 text-center">Zapisane Plany Suplementacyjne</h2>
             {plans.map((plan, index) => (
                 <div
-                    key={index}
+                    key={plan.id}
                     className="mb-4 p-4 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer"
-                    onClick={() => togglePlan(index)}
                 >
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center" onClick={() => togglePlan(index)}>
                         <h3 className="text-xl font-bold">{plan.name}</h3>
-                        <span className="text-blue-500">
+                        <span className={`text-blue-500 ${expandedPlan === index ? 'rotate-180' : ''}`}>
                             <svg
-                                className={`w-6 h-6 transition-transform ${expandedPlan === index ? 'rotate-180' : ''}`}
+                                className="w-6 h-6 transition-transform"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -53,16 +56,48 @@ const SavedSupplementPlans = ({ plans, supplementOptions }) => {
                                     <ul className="list-disc list-inside">
                                         {dayPlan.supplements.map((supplement, j) => (
                                             <li key={j}>
-                                                {getSupplementName(supplement.name)} - {supplement.amount} {supplement.unit}
+                                                {supplement.name} - {supplement.amount} {supplement.unit}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             ))}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    confirmDelete(plan.id);
+                                }}
+                                className="text-sm text-red-500 hover:text-red-700 mt-4"
+                            >
+                                Usuń
+                            </button>
                         </div>
                     )}
                 </div>
             ))}
+
+            {/* Modal usuwania */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                        <h3 className="text-xl font-bold mb-4">Czy na pewno chcesz usunąć ten plan?</h3>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={deletePlan}
+                                className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
+                            >
+                                Tak, usuń
+                            </button>
+                            <button
+                                onClick={closeDeleteModal}
+                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+                            >
+                                Anuluj
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -84,7 +84,22 @@ const Supplementation = () => {
             console.log("All fields must be filled");
         }
     };
+    const deletePlan = async (planId) => {
+        try {
+            const response = await fetchWithAuth(`http://gym-app.test/api/delete-supplement-plan/${planId}`, {
+                method: "DELETE",
+            });
 
+            if (response.status === 200) {
+                setSavedPlans(prevPlans => prevPlans.filter(plan => plan.id !== planId));
+                console.log("Plan suplementacyjny został usunięty.");
+            } else {
+                console.error("Wystąpił błąd podczas usuwania planu.");
+            }
+        } catch (error) {
+            console.error("Błąd podczas usuwania planu:", error);
+        }
+    };
     const savePlan = async () => {
         if (planName && Object.keys(supplements).length > 0) {
             try {
@@ -141,7 +156,7 @@ const Supplementation = () => {
             <h1 className="text-5xl font-bold mb-6 text-center text-gray-900">Kreator Planu Suplementacyjnego</h1>
 
             {supplementOptions.length > 0 && (
-                <SavedSupplementPlans plans={savedPlans} supplementOptions={supplementOptions} />
+                <SavedSupplementPlans plans={savedPlans} onDelete={deletePlan} supplementOptions={supplementOptions} />
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
