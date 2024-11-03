@@ -1,142 +1,189 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const PersonalDetails = () => {
+    const [profile, setProfile] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
-    const [personalData, setPersonalData] = useState({
-        name: 'Jan Kowalski',
-        email: 'jan.kowalski@example.com',
-        age: 30,
-        height: 180,
-        weight: 75,
-        profileImage: 'https://via.placeholder.com/150'
+    const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        phone: '',
+        birthdate: '',
+        address: ''
     });
-    const [newImage, setNewImage] = useState(null);
+
+    useEffect(() => {
+        fetchUserProfile();
+    }, []);
+
+    const fetchUserProfile = async () => {
+        try {
+            const response = await fetch('http://gym-app.test/api/customer-profile/me', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (response.status === 404) {
+                setIsEditing(true); // Aktywuj tryb edycji jeśli profil nie istnieje
+            } else if (response.ok) {
+                const data = await response.json();
+                setProfile(data.data);
+                setFormData({
+                    first_name: data.data.first_name || '',
+                    last_name: data.data.last_name || '',
+                    phone: data.data.phone || '',
+                    birthdate: data.data.birthdate || '',
+                    address: data.data.address || ''
+                });
+            }
+        } catch (error) {
+            console.error('Błąd przy pobieraniu profilu:', error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setPersonalData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        setFormData({
+            ...formData,
+            [name]: value
+        });
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setNewImage(URL.createObjectURL(file));
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        if (profile) {
+            setFormData({
+                first_name: profile.first_name || '',
+                last_name: profile.last_name || '',
+                phone: profile.phone || '',
+                birthdate: profile.birthdate || '',
+                address: profile.address || ''
+            });
         }
     };
 
-    const toggleEdit = () => {
-        setIsEditing(!isEditing);
-    };
+    const handleSave = async () => {
+        try {
+            const method = profile ? 'PUT' : 'POST';
+            const endpoint = profile
+                ? `http://gym-app.test/api/customer-profile/me`
+                : 'http://gym-app.test/api/customer-profile/me';
 
-    const saveData = () => {
-        toggleEdit();
-        if (newImage) {
-            setPersonalData((prevData) => ({
-                ...prevData,
-                profileImage: newImage
-            }));
+            const response = await fetch(endpoint, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setProfile(data.data);
+                setIsEditing(false);
+            } else {
+                console.error('Błąd przy zapisywaniu profilu:', data);
+            }
+        } catch (error) {
+            console.error('Błąd przy zapisywaniu profilu:', error);
         }
-        console.log('Zapisano dane:', personalData);
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md relative">
-            {/* Przycisk Edytuj w prawym górnym rogu */}
-            {!isEditing && (
-                <button
-                    onClick={toggleEdit}
-                    className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg"
-                >
-                    Edytuj
-                </button>
-            )}
-
-            <div className="flex items-center mb-6">
-                <img
-                    src={newImage || personalData.profileImage}
-                    alt="Profile"
-                    className="w-32 h-32 rounded-full mr-4"
-                />
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
+            <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Dane Osobowe</h2>
+            {profile || isEditing ? (
                 <div>
-                    <h2 className="text-2xl font-bold">{personalData.name}</h2>
-                    <p className="text-gray-600">{personalData.email}</p>
-                </div>
-            </div>
-
-            {isEditing ? (
-                <div>
-                    <div className="mb-4">
-                        <label className="block font-semibold">Imię</label>
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-600">Imię</label>
                         <input
                             type="text"
-                            name="name"
-                            value={personalData.name}
+                            name="first_name"
+                            value={formData.first_name}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded-lg"
+                            disabled={!isEditing}
+                            className={`w-full p-3 border rounded-lg text-gray-800 ${!isEditing ? 'bg-gray-100' : 'bg-white'}`}
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block font-semibold">Email</label>
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-600">Nazwisko</label>
                         <input
                             type="text"
-                            name="email"
-                            value={personalData.email}
+                            name="last_name"
+                            value={formData.last_name}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded-lg"
+                            disabled={!isEditing}
+                            className={`w-full p-3 border rounded-lg text-gray-800 ${!isEditing ? 'bg-gray-100' : 'bg-white'}`}
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block font-semibold">Wiek</label>
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-600">Telefon</label>
                         <input
-                            type="number"
-                            name="age"
-                            value={personalData.age}
+                            type="text"
+                            name="phone"
+                            value={formData.phone}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded-lg"
+                            disabled={!isEditing}
+                            className={`w-full p-3 border rounded-lg text-gray-800 ${!isEditing ? 'bg-gray-100' : 'bg-white'}`}
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block font-semibold">Wzrost (cm)</label>
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-600">Data urodzenia</label>
                         <input
-                            type="number"
-                            name="height"
-                            value={personalData.height}
+                            type="date"
+                            name="birthdate"
+                            value={formData.birthdate}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded-lg"
+                            disabled={!isEditing}
+                            className={`w-full p-3 border rounded-lg text-gray-800 ${!isEditing ? 'bg-gray-100' : 'bg-white'}`}
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block font-semibold">Waga (kg)</label>
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-600">Adres</label>
                         <input
-                            type="number"
-                            name="weight"
-                            value={personalData.weight}
+                            type="text"
+                            name="address"
+                            value={formData.address}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded-lg"
+                            disabled={!isEditing}
+                            className={`w-full p-3 border rounded-lg text-gray-800 ${!isEditing ? 'bg-gray-100' : 'bg-white'}`}
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block font-semibold">Zdjęcie profilowe</label>
-                        <input
-                            type="file"
-                            onChange={handleImageChange}
-                            className="w-full p-2 border rounded-lg"
-                        />
-                    </div>
-                    <button onClick={saveData} className="bg-blue-500 text-white px-4 py-2 rounded-lg">Zapisz</button>
+
+                    {isEditing ? (
+                        <div className="flex justify-between">
+                            <button
+                                onClick={handleSave}
+                                className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 mr-2"
+                            >
+                                Zapisz
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="w-full py-3 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition-all duration-200 ml-2"
+                            >
+                                Anuluj
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="text-center">
+                            <button
+                                onClick={handleEdit}
+                                className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 mt-4"
+                            >
+                                Edytuj Profil
+                            </button>
+                        </div>
+                    )}
                 </div>
             ) : (
-                <div>
-                    <h3 className="text-xl font-semibold mb-2">Podstawowe dane</h3>
-                    <ul className="list-disc list-inside">
-                        <li>Wiek: {personalData.age} lat</li>
-                        <li>Wzrost: {personalData.height} cm</li>
-                        <li>Waga: {personalData.weight} kg</li>
-                    </ul>
-                </div>
+                <p className="text-center text-gray-600">Ładowanie profilu...</p>
             )}
         </div>
     );
