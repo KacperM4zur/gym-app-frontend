@@ -1,68 +1,83 @@
+// import React, { useState } from 'react';
+//
+// const CreatePost = ({ addPost }) => {
+//     const [title, setTitle] = useState('');
+//     const [body, setBody] = useState('');
+//
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         if (title.trim() && body.trim()) {
+//             await addPost({ title, body });
+//             setTitle('');
+//             setBody('');
+//         }
+//     };
+//
+//     return (
+//         <form onSubmit={handleSubmit} className="w-full mt-4">
+//             <input
+//                 type="text"
+//                 placeholder="Tytuł posta"
+//                 value={title}
+//                 onChange={(e) => setTitle(e.target.value)}
+//                 className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+//             />
+//             <textarea
+//                 placeholder="Treść posta"
+//                 value={body}
+//                 onChange={(e) => setBody(e.target.value)}
+//                 className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+//                 rows="5"
+//             ></textarea>
+//             <button
+//                 type="submit"
+//                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+//             >
+//                 Dodaj post
+//             </button>
+//         </form>
+//     );
+// };
+//
+// export default CreatePost;
+
 import React, { useState } from 'react';
 
-const CreatePost = ({ addPost, closeForm, currentUser }) => {
+const CreatePost = ({ addPost }) => {
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [image, setImage] = useState(null); // Przechowywanie pliku obrazu
+    const [body, setBody] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const newPost = {
-            id: Date.now(),
-            title,
-            summary: content.substring(0, 100) + '...',
-            content,
-            date: new Date().toLocaleDateString(),
-            image: image ? URL.createObjectURL(image) : '', // Przechowywanie URL obrazu lokalnie
-            comments: [],
-            author: currentUser, // Autor to aktualny użytkownik
-        };
-
-        addPost(newPost);
-        setTitle('');
-        setContent('');
-        setImage(null);
-    };
-
-    const handleImageChange = (e) => {
-        setImage(e.target.files[0]); // Zapisanie wybranego pliku
+        if (title.trim() && body.trim()) {
+            await addPost({ title, body });
+            setTitle('');
+            setBody('');
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded-lg mb-6">
-            <h2 className="text-2xl font-bold mb-4">Stwórz Nowy Post</h2>
+        <form onSubmit={handleSubmit} className="w-full mt-4">
             <input
                 type="text"
-                placeholder="Tytuł postu"
+                placeholder="Tytuł posta"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-2 mb-4 border rounded"
-                required
+                className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <textarea
-                placeholder="Treść postu"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full p-2 mb-4 border rounded"
-                rows="4"
-                required
-            />
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full p-2 mb-4 border rounded"
-                required
-            />
-            <div className="flex justify-between">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded" type="submit">
-                    Dodaj Post
-                </button>
-                <button className="bg-red-500 text-white px-4 py-2 rounded" type="button" onClick={closeForm}>
-                    Anuluj
-                </button>
-            </div>
+                placeholder="Treść posta"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                className="w-full p-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows="5"
+            ></textarea>
+            <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            >
+                Dodaj post
+            </button>
         </form>
     );
 };

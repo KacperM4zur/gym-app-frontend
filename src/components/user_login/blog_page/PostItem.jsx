@@ -1,14 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const PostItem = ({ post, openPostModal }) => {
+const PostItem = ({ post, onClick, onDelete, userId }) => {
+    const [showModal, setShowModal] = useState(false);
+
+    const handleDelete = () => {
+        onDelete(post.id);
+        setShowModal(false);
+    };
+
     return (
-        <div className="bg-gray-200 shadow-md rounded-lg overflow-hidden mb-6 transition-transform hover:scale-105 duration-200 cursor-pointer" onClick={() => openPostModal(post)}>
-            {post.image && <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />} {/* Obraz postu */}
-            <div className="p-6">
-                <h2 className="text-3xl font-bold mb-2">{post.title}</h2>
-                <p className="text-gray-600 mb-2">{post.date}</p>
-                <p className="text-gray-700 mb-4">{post.summary}</p>
+        <div className="p-4 mb-4 bg-gray-100 rounded shadow-md hover:bg-gray-200">
+            <div onClick={onClick} className="cursor-pointer">
+                <h3 className="text-xl font-semibold">{post.title}</h3>
+                <p>{post.body.substring(0, 100)}...</p>
+                {post.customer && post.customer.name && (
+                    <p className="text-sm text-gray-600">Autor: {post.customer.name}</p>
+                )}
             </div>
+
+            {post.customer && post.customer.id === userId && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setShowModal(true);
+                    }}
+                    className="mt-2 text-red-600 hover:underline"
+                >
+                    Usuń
+                </button>
+            )}
+
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-4 rounded">
+                        <p className="mb-4">Czy na pewno chcesz usunąć ten post?</p>
+                        <button onClick={handleDelete} className="mr-2 px-4 py-2 bg-red-600 text-white rounded">Tak</button>
+                        <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">Anuluj</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

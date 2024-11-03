@@ -1,44 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import CommentForm from './CommentForm';
 
-const CommentSection = ({ postId, comments }) => {
-    const [newComment, setNewComment] = useState('');
-
-    const handleAddComment = (e) => {
-        e.preventDefault();
-        const comment = {
-            id: Date.now(),
-            author: 'Użytkownik',
-            content: newComment,
-        };
-        comments.push(comment); // W praktyce będziesz dodawał komentarze do stanu globalnego
-        setNewComment('');
-    };
-
+const CommentSection = ({ postId, comments, onAddComment }) => {
     return (
-        <div className="mt-6">
-            <h3 className="text-2xl font-bold mb-4">Komentarze</h3>
-            {comments.length > 0 ? (
-                comments.map(comment => (
-                    <div key={comment.id} className="mb-2">
-                        <strong>{comment.author}</strong>: {comment.content}
-                    </div>
-                ))
-            ) : (
-                <p>Brak komentarzy.</p>
-            )}
-
-            <form onSubmit={handleAddComment} className="mt-4">
-                <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Dodaj komentarz..."
-                    className="w-full p-2 border rounded mb-2"
-                    rows="3"
-                />
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                    Dodaj Komentarz
-                </button>
-            </form>
+        <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">Komentarze</h3>
+            {comments.map((comment) => (
+                <div key={comment.id} className="mb-4 p-2 bg-gray-100 rounded">
+                    <p>{comment.body}</p>
+                    {comment.customer && comment.customer.name && (
+                        <p className="text-sm text-gray-600">Autor: {comment.customer.name}</p>
+                    )}
+                </div>
+            ))}
+            <CommentForm postId={postId} onAddComment={onAddComment} />
         </div>
     );
 };
