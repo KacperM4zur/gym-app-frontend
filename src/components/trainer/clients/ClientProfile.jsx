@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
 import {ChevronDownIcon, ChevronUpIcon} from "@heroicons/react/16/solid/index.js";
 
+const dayMap = {
+    1: 'Poniedziałek',
+    2: 'Wtorek',
+    3: 'Środa',
+    4: 'Czwartek',
+    5: 'Piątek',
+    6: 'Sobota',
+    7: 'Niedziela'
+};
+
 const ClientProfile = ({ client, supplementPlan, trainingPlan }) => {
     const [isSupplementPlanOpen, setIsSupplementPlanOpen] = useState(false);
     const [isTrainingPlanOpen, setIsTrainingPlanOpen] = useState(false);
 
+    if (!client) {
+        return <p>Ładowanie profilu...</p>;
+    }
+
     return (
         <div className="p-6 bg-white shadow-lg rounded-lg">
-            <h2 className="text-3xl font-bold mb-4">{client.name}</h2>
-            <p><strong>Email:</strong> {client.email}</p>
+            <h2 className="text-3xl font-bold mb-4">{client.first_name} {client.last_name}</h2>
             <p><strong>Telefon:</strong> {client.phone}</p>
-            <p><strong>Wiek:</strong> {client.age}</p>
+            <p><strong>Data urodzenia:</strong> {client.birthdate}</p>
+            <p><strong>Adres:</strong> {client.address}</p>
 
-            {/* Plan Suplementacyjny */}
+            {/* Supplement Plan */}
             <div className="mt-8">
                 <div
                     className="flex justify-between items-center cursor-pointer"
@@ -28,13 +42,13 @@ const ClientProfile = ({ client, supplementPlan, trainingPlan }) => {
                 {isSupplementPlanOpen && (
                     <div className="bg-gray-100 p-4 rounded-lg shadow transition-all">
                         {supplementPlan ? (
-                            Object.entries(supplementPlan).map(([day, supplements], index) => (
+                            supplementPlan.supplement_plan_days.map((day, index) => (
                                 <div key={index}>
-                                    <h4 className="text-xl font-semibold">{day}</h4>
+                                    <h4 className="text-xl font-semibold">{dayMap[day.day_id]}</h4>
                                     <ul className="list-disc list-inside">
-                                        {supplements.map((supplement, idx) => (
+                                        {day.supplement_details.map((supplement, idx) => (
                                             <li key={idx}>
-                                                {supplement.name} – {supplement.amount} – {supplement.time}
+                                                {supplement.supplement.name} - {supplement.amount} {supplement.unit}
                                             </li>
                                         ))}
                                     </ul>
@@ -47,7 +61,7 @@ const ClientProfile = ({ client, supplementPlan, trainingPlan }) => {
                 )}
             </div>
 
-            {/* Plan Treningowy */}
+            {/* Training Plan */}
             <div className="mt-8">
                 <div
                     className="flex justify-between items-center cursor-pointer"
@@ -63,13 +77,13 @@ const ClientProfile = ({ client, supplementPlan, trainingPlan }) => {
                 {isTrainingPlanOpen && (
                     <div className="bg-gray-100 p-4 rounded-lg shadow transition-all">
                         {trainingPlan ? (
-                            Object.entries(trainingPlan).map(([day, exercises], index) => (
+                            trainingPlan.workout_days.map((day, index) => (
                                 <div key={index}>
-                                    <h4 className="text-xl font-semibold">{day}</h4>
+                                    <h4 className="text-xl font-semibold">{dayMap[day.day_id]}</h4>
                                     <ul className="list-disc list-inside">
-                                        {exercises.map((exercise, idx) => (
+                                        {day.workout_exercises.map((exercise, idx) => (
                                             <li key={idx}>
-                                                {exercise.name} – {exercise.sets} serie, {exercise.reps} powtórzeń
+                                                {exercise.exercise.name} - {exercise.sets} serie, {exercise.reps} powtórzeń, {exercise.weight} kg
                                             </li>
                                         ))}
                                     </ul>
@@ -86,3 +100,5 @@ const ClientProfile = ({ client, supplementPlan, trainingPlan }) => {
 };
 
 export default ClientProfile;
+
+

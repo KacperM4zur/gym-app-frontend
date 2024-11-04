@@ -1,47 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const Chat = ({ client }) => {
-    const [message, setMessage] = useState('');
-    const [chatHistory, setChatHistory] = useState([]);
+const Chat = ({ senderId, receiverId }) => {
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
+    const chatEndRef = useRef(null);
 
-    const handleSendMessage = () => {
-        if (message.trim()) {
-            const newMessage = {
-                text: message,
-                sender: 'trener',  // Zdefiniowane, że trener wysyła wiadomość
-                timestamp: new Date(),
-            };
-            setChatHistory([...chatHistory, newMessage]);
-            setMessage('');
+    useEffect(() => {
+        fetchMessages();
+    }, [receiverId]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const fetchMessages = async () => {
+        try {
+            const response = await fetch(`http://gym-app.test/api/clients/${senderId}/${receiverId}/messages`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setMessages(data);
+            } else {
+                console.error("Failed to fetch messages.");
+            }
+        } catch (error) {
+            console.error("Error fetching messages:", error);
         }
     };
 
-    return (
-        <div className="p-6 bg-gray-100 rounded-lg shadow-lg mt-6">
-            <h2 className="text-2xl font-bold mb-4">Czat z {client.name}</h2>
+    const handleSendMessage = async () => {
+        if (!newMessage.trim()) return;
 
-            <div className="h-64 overflow-y-auto bg-white p-4 rounded-lg shadow-inner mb-4">
-                {chatHistory.map((msg, index) => (
-                    <div key={index} className={`mb-2 ${msg.sender === 'trener' ? 'text-right' : 'text-left'}`}>
-                        <span className={`inline-block px-3 py-2 rounded-lg ${msg.sender === 'trener' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
-                            {msg.text}
-                        </span>
-                        <div className="text-xs text-gray-500">{msg.timestamp.toLocaleTimeString()}</div>
+        try {
+            const response = await fetch(`http://gym-app.test/api/clients/${senderId}/messages/send`, {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    receiver_id: receiverId,
+                    message: newMessage
+                })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setMessages(prevMessages => [...prevMessages, data]);
+                setNewMessage("");
+                scrollToBottom();
+            } else {
+                console.error("Failed to send message.");
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    };
+
+    const scrollToBottom = () => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    return (
+        <div className="flex flex-col h-full bg-white shadow-lg rounded-lg p-4">
+            <h2 className="text-2xl font-semibold mb-4">Czat</h2>
+
+            {/* Sekcja wiadomości z przewijaniem */}
+            <div className="flex-1 overflow-y-auto mb-4 p-2 max-h-[400px] space-y-2">
+                {messages.map((msg, index) => (
+                    <div
+                        key={index}
+                        className={`flex ${msg.sender_id === senderId ? 'justify-end' : 'justify-start'}`}
+                    >
+                        <div
+                            className={`max-w-xs p-2 rounded-lg ${msg.sender_id === senderId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
+                            style={{
+                                borderRadius: "15px",
+                                padding: "10px 15px",
+                                maxWidth: "60%", // Ogranicza szerokość wiadomości
+                                wordWrap: "break-word" // Złamuje długie słowa
+                            }}
+                        >
+                            {msg.message}
+                        </div>
                     </div>
                 ))}
+                <div ref={chatEndRef} />
             </div>
 
-            <div className="flex space-x-4">
+            {/* Pole do wpisywania wiadomości */}
+            <div className="flex items-center">
                 <input
                     type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Napisz wiadomość..."
-                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    className="flex-1 p-2 border rounded-lg mr-2"
                 />
                 <button
                     onClick={handleSendMessage}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg"
                 >
                     Wyślij
                 </button>
