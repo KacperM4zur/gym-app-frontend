@@ -1,75 +1,163 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ClientList from "../../components/trainer/progress_tracking/ClientList.jsx";
-import ProgressDetails from "../../components/trainer/progress_tracking/ProgressDetails.jsx";
+import WeightChart from "../../components/trainer/progress_tracking/WeightChart.jsx";
+import MeasurementChart from "../../components/trainer/progress_tracking/MeasurementChart.jsx";
+import MaxLiftChart from "../../components/trainer/progress_tracking/MaxLiftChart.jsx";
 import AddNoteForm from "../../components/trainer/progress_tracking/AddNoteForm.jsx";
-import AddProgressForm from "../../components/trainer/progress_tracking/AddProgressForm.jsx";
+import {ChevronDownIcon, ChevronUpIcon} from "@heroicons/react/16/solid/index.js";
 
 const ProgressTracking = () => {
-    const [selectedClientId, setSelectedClientId] = useState(null);
+    const [clients, setClients] = useState([]);
+    const [selectedClient, setSelectedClient] = useState(null);
+    const [weights, setWeights] = useState([]);
+    const [measurements, setMeasurements] = useState([]);
+    const [maxLifts, setMaxLifts] = useState([]);
+    const [notes, setNotes] = useState([]);
+    const [isWeightChartOpen, setIsWeightChartOpen] = useState(false);
+    const [isMeasurementChartOpen, setIsMeasurementChartOpen] = useState(false);
+    const [isMaxLiftChartOpen, setIsMaxLiftChartOpen] = useState(false);
 
-    const clients = [
-        { id: 1, name: 'Jan Kowalski' },
-        { id: 2, name: 'Anna Nowak' },
-    ];
+    useEffect(() => {
+        fetchClients();
+    }, []);
 
-    const [progressData, setProgressData] = useState({
-        1: [
-            { date: '2024-01-01', weight: 80, note: 'Przyrost masy, stabilny progres.' },
-            { date: '2024-02-01', weight: 78, note: 'Lekki spadek wagi, zwiększona intensywność treningu.' }
-        ],
-        2: [
-            { date: '2024-01-01', weight: 65, note: 'Start programu, dobra forma.' },
-            { date: '2024-02-01', weight: 67, note: 'Zwiększona masa mięśniowa.' }
-        ],
-    });
+    useEffect(() => {
+        if (selectedClient) {
+            fetchWeights(selectedClient);
+            fetchMeasurements(selectedClient);
+            fetchMaxLifts(selectedClient);
+            fetchNotes(selectedClient);
+        }
+    }, [selectedClient]);
 
-    const [notes, setNotes] = useState({
-        1: [{ id: 1, content: 'Jan Kowalski - Pierwsza notatka.' }],
-        2: [{ id: 2, content: 'Anna Nowak - Pierwsza notatka.' }],
-    });
-
-    const handleClientSelect = (clientId) => {
-        setSelectedClientId(clientId);
+    const fetchClients = async () => {
+        const response = await fetch('http://gym-app.test/api/clients', {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await response.json();
+        setClients(data);
     };
 
-    const handleAddProgress = (clientId, newProgress) => {
-        setProgressData((prevData) => ({
-            ...prevData,
-            [clientId]: [...(prevData[clientId] || []), newProgress]
-        }));
+    const fetchWeights = async (clientId) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${clientId}/weights`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await response.json();
+        setWeights(data.data);
     };
 
-    const handleAddNote = (clientId, newNote) => {
-        setNotes((prevNotes) => ({
-            ...prevNotes,
-            [clientId]: [...(prevNotes[clientId] || []), { id: prevNotes[clientId].length + 1, content: newNote }]
-        }));
+    const fetchMeasurements = async (clientId) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${clientId}/measurements`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await response.json();
+        setMeasurements(data.data);
+    };
+
+    const fetchMaxLifts = async (clientId) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${clientId}/max-lifts`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await response.json();
+        setMaxLifts(data.data);
+    };
+
+    const fetchNotes = async (clientId) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${clientId}/advices`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await response.json();
+        setNotes(data.data);
+    };
+
+    const handleSelectClient = (clientId) => {
+        setSelectedClient(clientId);
+    };
+
+    const handleAddNote = async (noteContent) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${selectedClient}/advices`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: noteContent }),
+        });
+        const data = await response.json();
+        setNotes([...notes, data.data]);
     };
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-5xl font-bold mb-6 text-center">Monitorowanie Postępów</h1>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
-                    <ClientList clients={clients} onSelect={handleClientSelect} selectedClientId={selectedClientId} />
-                </div>
-                <div className="md:col-span-2">
-                    {selectedClientId ? (
-                        <>
-                            <ProgressDetails
-                                clientId={selectedClientId}
-                                notes={notes[selectedClientId] || []}
-                                progressData={progressData[selectedClientId] || []}
-                            />
-                            <AddProgressForm clientId={selectedClientId} onAddProgress={handleAddProgress} />
-                            <AddNoteForm clientId={selectedClientId} onAddNote={handleAddNote} />
-                        </>
-                    ) : (
-                        <div className="text-center bg-white shadow-md rounded-lg p-6">
-                            <p>Wybierz klienta, aby wyświetlić jego postęp.</p>
+        <div className="flex">
+            <div className="w-1/4 p-4">
+                <ClientList
+                    clients={clients}
+                    onSelectClient={handleSelectClient}
+                    selectedClient={selectedClient}
+                />
+            </div>
+            <div className="w-3/4 p-4 space-y-4">
+                {selectedClient && (
+                    <>
+                        <div>
+                            <div
+                                className="flex justify-between items-center cursor-pointer"
+                                onClick={() => setIsWeightChartOpen(!isWeightChartOpen)}
+                            >
+                                <h3 className="text-xl font-bold">Wykres Wagi</h3>
+                                {isWeightChartOpen ? (
+                                    <ChevronUpIcon className="w-6 h-6 text-gray-500" />
+                                ) : (
+                                    <ChevronDownIcon className="w-6 h-6 text-gray-500" />
+                                )}
+                            </div>
+                            {isWeightChartOpen && <WeightChart weights={weights} />}
                         </div>
-                    )}
-                </div>
+
+                        <div>
+                            <div
+                                className="flex justify-between items-center cursor-pointer"
+                                onClick={() => setIsMeasurementChartOpen(!isMeasurementChartOpen)}
+                            >
+                                <h3 className="text-xl font-bold">Wykres Pomiarów</h3>
+                                {isMeasurementChartOpen ? (
+                                    <ChevronUpIcon className="w-6 h-6 text-gray-500" />
+                                ) : (
+                                    <ChevronDownIcon className="w-6 h-6 text-gray-500" />
+                                )}
+                            </div>
+                            {isMeasurementChartOpen && <MeasurementChart measurements={measurements} />}
+                        </div>
+
+                        <div>
+                            <div
+                                className="flex justify-between items-center cursor-pointer"
+                                onClick={() => setIsMaxLiftChartOpen(!isMaxLiftChartOpen)}
+                            >
+                                <h3 className="text-xl font-bold">Wykres Ciężarów Maksymalnych</h3>
+                                {isMaxLiftChartOpen ? (
+                                    <ChevronUpIcon className="w-6 h-6 text-gray-500" />
+                                ) : (
+                                    <ChevronDownIcon className="w-6 h-6 text-gray-500" />
+                                )}
+                            </div>
+                            {isMaxLiftChartOpen && <MaxLiftChart maxLifts={maxLifts} />}
+                        </div>
+
+                        <AddNoteForm onAddNote={handleAddNote} />
+                        <div className="mt-4">
+                            <h2 className="text-xl font-bold mb-2">Notatki</h2>
+                            <ul>
+                                {notes.map((note) => (
+                                    <li key={note.id} className="mb-2 p-2 border rounded flex justify-between">
+                                        <span>{note.content}</span>
+                                        <span className="text-gray-500 text-sm">{new Date(note.created_at).toLocaleDateString()}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

@@ -70,7 +70,7 @@ const Clients = () => {
         <div className="flex flex-col md:flex-row md:space-x-4 p-4">
             {/* Lista klientów */}
             <div className="md:w-1/4 w-full mb-4 md:mb-0">
-                <ClientList clients={clients} onSelectClient={handleSelectClient} />
+                <ClientList clients={clients} onSelectClient={handleSelectClient} selectedClient={receiverId} />
             </div>
 
             {/* Profil klienta i czat */}

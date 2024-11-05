@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ClientList = ({ clients, onSelectClient, selectedClientId }) => {
+const ClientList = ({ clients, onSelectClient, selectedClient }) => {
     return (
         <div>
             <h2 className="text-2xl font-bold mb-4">Lista klientów</h2>
@@ -8,8 +8,9 @@ const ClientList = ({ clients, onSelectClient, selectedClientId }) => {
                 {clients.map(client => (
                     <li
                         key={client.id}
+                        className={`p-4 bg-white shadow-lg rounded-lg cursor-pointer 
+                            ${selectedClient === client.id ? 'bg-blue-300' : 'hover:bg-blue-100'}`}
                         onClick={() => onSelectClient(client.id)}
-                        className={`p-4 bg-white shadow-lg rounded-lg cursor-pointer hover:bg-blue-100 selected:bg-blue-200 `}
                     >
                         <div className="flex justify-between items-center">
                             <span>{client.name}</span>
