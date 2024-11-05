@@ -97,7 +97,7 @@ const ProgressTracking = () => {
                 />
             </div>
             <div className="w-3/4 p-4 space-y-4">
-                {selectedClient && (
+                {selectedClient ? (
                     <>
                         <div>
                             <div
@@ -157,6 +157,8 @@ const ProgressTracking = () => {
                             </ul>
                         </div>
                     </>
+                ) : (
+                    <p className="text-gray-500">Wybierz klienta, aby zobaczyć szczegóły</p>
                 )}
             </div>
         </div>

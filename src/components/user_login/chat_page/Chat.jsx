@@ -62,7 +62,7 @@ const Chat = ({ trainer, userId }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-50 p-4 rounded-lg shadow-md">
+        <div className="flex-1 overflow-y-auto bg-white p-4 rounded-lg mb-4 shadow-inner max-h-96">
             <h3 className="text-xl font-semibold mb-2">Czat z trenerem: {trainer.name}</h3>
             <div className="flex-1 overflow-y-auto bg-white p-4 rounded-lg mb-4 shadow-inner">
                 {messages.map((msg, index) => (
