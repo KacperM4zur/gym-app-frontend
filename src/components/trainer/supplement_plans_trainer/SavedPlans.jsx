@@ -1,38 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const SavedPlans = ({ plans, selectedClientId, onDelete }) => {
-    const clientPlans = plans.filter(plan => plan.clientId === selectedClientId);
+const SavedPlans = ({ clientId, refresh, onRefreshComplete }) => {
+    const [plans, setPlans] = useState([]);
+
+    useEffect(() => {
+        const fetchPlans = async () => {
+            const response = await fetch(`http://gym-app.test/api/clients/${clientId}/supplement-plans`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setPlans(data.data.reverse()); // Display latest plans first
+        };
+
+        if (clientId) {
+            fetchPlans();
+        }
+    }, [clientId]);
+
+    // Odświeżanie, gdy zmienia się prop `refresh`
+    useEffect(() => {
+        if (refresh && clientId) {
+            const fetchPlans = async () => {
+                const response = await fetch(`http://gym-app.test/api/clients/${clientId}/supplement-plans`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                });
+                const data = await response.json();
+                setPlans(data.data.reverse()); // Display latest plans first
+                onRefreshComplete(); // Informujemy rodzica o zakończeniu odświeżania
+            };
+            fetchPlans();
+        }
+    }, [refresh, clientId, onRefreshComplete]);
 
     return (
-        <div className="mt-8">
-            <h2 className="text-3xl font-bold mb-6">Zapisane Plany Suplementacyjne</h2>
-            {clientPlans.length > 0 ? (
-                clientPlans.map((plan, index) => (
-                    <div key={index} className="p-4 bg-white rounded-lg shadow-md mb-4">
-                        <h3 className="text-xl font-bold">{plan.name}</h3>
-                        {Object.keys(plan.days).map((day, i) => (
+        <div className="mt-4">
+            <h3 className="text-xl font-semibold">Zapisane plany suplementacyjne</h3>
+            {plans.length > 0 ? (
+                plans.map((plan, index) => (
+                    <div key={index} className="mt-2 p-3 border rounded bg-white shadow">
+                        <strong className="text-lg">{plan.name}</strong>
+                        {plan.plan.map((day, i) => (
                             <div key={i} className="mt-2">
-                                <h4 className="font-semibold">{day}</h4>
-                                <ul className="list-disc ml-5">
-                                    {plan.days[day].map((supplement, j) => (
+                                <p className="font-semibold">{day.day}:</p>
+                                <ul className="list-disc ml-4">
+                                    {day.supplements.map((supp, j) => (
                                         <li key={j}>
-                                            {supplement.name} - {supplement.amount}, {supplement.time}
+                                            {supp.name} - {supp.amount} {supp.unit}
                                         </li>
                                     ))}
                                 </ul>
                             </div>
                         ))}
-                        {/* Przycisk do usunięcia planu */}
-                        <button
-                            onClick={() => onDelete(plan.id)}
-                            className="bg-red-500 text-white px-4 py-2 mt-2 rounded-lg hover:bg-red-600 transition duration-300"
-                        >
-                            Usuń plan
-                        </button>
                     </div>
                 ))
             ) : (
-                <p className="text-gray-500">Brak zapisanych planów</p>
+                <p className="text-gray-500 mt-2">Brak zapisanych planów.</p>
             )}
         </div>
     );

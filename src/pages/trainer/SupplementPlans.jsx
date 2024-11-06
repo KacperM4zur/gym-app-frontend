@@ -1,68 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ClientSelector from "../../components/trainer/supplement_plans_trainer/ClientSelector.jsx";
 import PlanForm from "../../components/trainer/supplement_plans_trainer/PlanForm.jsx";
-import PlanSummary from "../../components/trainer/supplement_plans_trainer/PlanSummary.jsx";
 import SavedPlans from "../../components/trainer/supplement_plans_trainer/SavedPlans.jsx";
 
 const SupplementPlans = () => {
+    const [clients, setClients] = useState([]);
     const [selectedClientId, setSelectedClientId] = useState(null);
-    const [plan, setPlan] = useState({});
-    const [planName, setPlanName] = useState('');
-    const [planNameSet, setPlanNameSet] = useState(false);
-    const [plans, setPlans] = useState([
-        { id: 1, name: 'Plan Suplementacyjny A', days: { 'Poniedziałek': [{ name: 'Białko', amount: '30g', time: 'rano' }] }, clientId: 1 },
-        { id: 2, name: 'Plan Suplementacyjny B', days: { 'Wtorek': [{ name: 'Omega 3', amount: '2 kapsułki', time: 'po posiłku' }] }, clientId: 2 }
-    ]);
+    const [supplements, setSupplements] = useState([]);
+    const [days, setDays] = useState([]);
+    const [refreshPlans, setRefreshPlans] = useState(false); // Flaga do odświeżania planów
 
-    const clients = [
-        { id: 1, name: 'Jan Kowalski', email: 'jan.kowalski@gmail.com' },
-        { id: 2, name: 'Anna Nowak', email: 'anna.nowak@gmail.com' }
-    ];
+    useEffect(() => {
+        const fetchClients = async () => {
+            const response = await fetch('http://gym-app.test/api/clients', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setClients(data);
+        };
 
-    const handleClientSelect = (clientId) => {
-        setSelectedClientId(clientId);
-        setPlan({});
-        setPlanName('');
-        setPlanNameSet(false);
-    };
+        const fetchSupplements = async () => {
+            const response = await fetch('http://gym-app.test/api/supplements', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setSupplements(data);
+        };
 
-    const handleSaveSupplement = (day, supplement) => {
-        setPlan((prevPlan) => ({
-            ...prevPlan,
-            [day]: [...(prevPlan[day] || []), supplement]
-        }));
-    };
+        const fetchDays = async () => {
+            const response = await fetch('http://gym-app.test/api/days', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setDays(data.data);
+        };
 
-    const handleSavePlan = () => {
-        setPlans([...plans, { id: plans.length + 1, name: planName, days: plan, clientId: selectedClientId }]);
-        setPlan({});
-        setPlanName('');
-        setPlanNameSet(false);
-    };
+        fetchClients();
+        fetchSupplements();
+        fetchDays();
+    }, []);
 
-    const handleSetPlanName = (name) => {
-        setPlanName(name);
-        setPlanNameSet(true);
-    };
+    const handleSavePlan = async (planData) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${selectedClientId}/supplement-plan`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ supplementPlan: planData }),
+        });
 
-    // Nowa funkcja do usuwania planów
-    const handleDeletePlan = (planId) => {
-        const updatedPlans = plans.filter(plan => plan.id !== planId);
-        setPlans(updatedPlans);  // Aktualizacja stanu planów
+        if (response.ok) {
+            console.log("Plan stworzony pomyślnie");
+            setRefreshPlans(true); // Ustawienie flagi do odświeżenia planów
+        } else {
+            console.error("Błąd przy tworzeniu planu");
+        }
     };
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-4xl font-bold mb-6">Plany Suplementacyjne</h1>
-
-            <ClientSelector clients={clients} selectedClientId={selectedClientId} onSelect={handleClientSelect} />
-
+        <div className="p-6">
+            <ClientSelector clients={clients} onSelectClient={setSelectedClientId} selectedClientId={selectedClientId} />
             {selectedClientId && (
                 <>
-                    {/* Przekazujemy handleDeletePlan do komponentu SavedPlans */}
-                    <SavedPlans plans={plans} selectedClientId={selectedClientId} onDelete={handleDeletePlan} />
-                    <PlanForm onSave={handleSaveSupplement} onSetPlanName={handleSetPlanName} planNameSet={planNameSet} />
-                    <PlanSummary plan={plan} planName={planName} onSave={handleSavePlan} planNameSet={planNameSet} />
+                    <PlanForm onSavePlan={handleSavePlan} supplements={supplements} days={days} />
+                    <SavedPlans clientId={selectedClientId} refresh={refreshPlans} onRefreshComplete={() => setRefreshPlans(false)} />
                 </>
             )}
         </div>

@@ -1,69 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ClientSelector from "../../components/trainer/training_plans_trainer/ClientSelector.jsx";
 import PlanForm from "../../components/trainer/training_plans_trainer/PlanForm.jsx";
-import PlanSummary from "../../components/trainer/training_plans_trainer/PlanSummary.jsx";
 import SavedPlans from "../../components/trainer/training_plans_trainer/SavedPlans.jsx";
 
 const TrainingPlans = () => {
+    const [clients, setClients] = useState([]);
     const [selectedClientId, setSelectedClientId] = useState(null);
-    const [plan, setPlan] = useState({});
-    const [planName, setPlanName] = useState('');
-    const [planNameSet, setPlanNameSet] = useState(false);
-    const [plans, setPlans] = useState([
-        { id: 1, name: 'Plan A', days: { 'Poniedziałek': [{ name: 'Przysiady', sets: '3', reps: '10', rest: '60s' }] }, clientId: 1 },
-        { id: 2, name: 'Plan B', days: { 'Wtorek': [{ name: 'Wyciskanie sztangi', sets: '4', reps: '8', rest: '90s' }] }, clientId: 2 }
-    ]);
+    const [exercises, setExercises] = useState([]);
+    const [days, setDays] = useState([]);
+    const [refreshPlans, setRefreshPlans] = useState(false);
 
-    const clients = [
-        { id: 1, name: 'Jan Kowalski', email: 'jan.kowalski@gmail.com' },
-        { id: 2, name: 'Anna Nowak', email: 'anna.nowak@gmail.com' }
-    ];
+    useEffect(() => {
+        const fetchClients = async () => {
+            const response = await fetch('http://gym-app.test/api/clients', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setClients(data);
+        };
 
-    const handleClientSelect = (clientId) => {
-        setSelectedClientId(clientId);
-        setPlan({});
-        setPlanName('');
-        setPlanNameSet(false);
-    };
+        const fetchExercises = async () => {
+            const response = await fetch('http://gym-app.test/api/exercises', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setExercises(data);
+        };
 
-    const handleSaveExercise = (day, exercise) => {
-        setPlan((prevPlan) => ({
-            ...prevPlan,
-            [day]: [...(prevPlan[day] || []), exercise]
-        }));
-    };
+        const fetchDays = async () => {
+            const response = await fetch('http://gym-app.test/api/days', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            const data = await response.json();
+            setDays(data.data);
+        };
 
-    const handleSavePlan = () => {
-        setPlans([...plans, { id: plans.length + 1, name: planName, days: plan, clientId: selectedClientId }]);
-        setPlan({});
-        setPlanName('');
-        setPlanNameSet(false);
-    };
+        fetchClients();
+        fetchExercises();
+        fetchDays();
+    }, []);
 
-    const handleSetPlanName = (name) => {
-        setPlanName(name);
-        setPlanNameSet(true);
-    };
+    const handleSavePlan = async (planData) => {
+        const response = await fetch(`http://gym-app.test/api/clients/${selectedClientId}/workout-plans`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ workoutPlan: planData }),
+        });
 
-    // Nowa funkcja do usuwania planów
-    const handleDeletePlan = (planId) => {
-        const updatedPlans = plans.filter(plan => plan.id !== planId);
-        setPlans(updatedPlans);  // Aktualizacja stanu planów
+        if (response.ok) {
+            setRefreshPlans((prev) => !prev); // Toggle refresh to force re-render
+        }
     };
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-4xl font-bold mb-6">Plany Treningowe</h1>
-
-            <ClientSelector clients={clients} selectedClientId={selectedClientId} onSelect={handleClientSelect} />
-
+        <div>
+            <ClientSelector clients={clients} onSelectClient={setSelectedClientId} selectedClientId={selectedClientId} />
             {selectedClientId && (
                 <>
-                    {/* Przekazujemy handleDeletePlan do komponentu SavedPlans */}
-                    <SavedPlans plans={plans} selectedClientId={selectedClientId} onDelete={handleDeletePlan} />
-                    <PlanForm onSave={handleSaveExercise} onSetPlanName={handleSetPlanName} planNameSet={planNameSet} />
-                    <PlanSummary plan={plan} planName={planName} onSave={handleSavePlan} planNameSet={planNameSet} />
-
+                    <PlanForm onSavePlan={handleSavePlan} exercises={exercises} days={days} />
+                    <SavedPlans clientId={selectedClientId} refresh={refreshPlans} />
                 </>
             )}
         </div>
