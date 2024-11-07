@@ -49,12 +49,7 @@ const PlanForm = ({ onSavePlan, exercises, days }) => {
                 onChange={(e) => setPlanName(e.target.value)}
                 className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
             />
-            <button
-                onClick={handleAddDay}
-                className="px-4 py-2 bg-green-500 text-white rounded-md mb-4"
-            >
-                Dodaj dzień
-            </button>
+
             {dayPlans.map((dayPlan, dayIndex) => (
                 <div key={dayIndex} className="mb-4 p-2 border border-gray-300 rounded-md">
                     <select
@@ -117,6 +112,12 @@ const PlanForm = ({ onSavePlan, exercises, days }) => {
                     ))}
                 </div>
             ))}
+            <button
+                onClick={handleAddDay}
+                className="px-4 py-2 bg-green-500 text-white rounded-md mb-4"
+            >
+                Dodaj dzień
+            </button>
             <button
                 onClick={handleSave}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-md m-2"
