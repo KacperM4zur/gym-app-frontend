@@ -158,7 +158,7 @@ const ProgressTracking = () => {
                         </div>
                     </>
                 ) : (
-                    <p className="text-gray-500">Wybierz klienta, aby zobaczyć szczegóły</p>
+                    <p className="text-black">Wybierz klienta, aby zobaczyć szczegóły</p>
                 )}
             </div>
         </div>

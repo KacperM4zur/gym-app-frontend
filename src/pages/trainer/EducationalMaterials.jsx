@@ -141,7 +141,7 @@ const EducationalMaterials = () => {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">Blog</h1>
+            <h1 className="text-3xl font-bold mb-6">Materiały edukacyjne</h1>
             <CreatePost addPost={addPost} />
             <div className="mt-8">
                 <h3 className="text-3xl font-bold mb-6">Posty</h3>
