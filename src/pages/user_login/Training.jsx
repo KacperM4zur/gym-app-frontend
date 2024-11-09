@@ -8,14 +8,13 @@ const Training = () => {
     const [step, setStep] = useState(1);
     const [selectedDay, setSelectedDay] = useState('');
     const [trainingPlan, setTrainingPlan] = useState({});
-    const [currentExercise, setCurrentExercise] = useState({ exercise: '', sets: '', reps: '', rest: '' });
+    const [currentExercise, setCurrentExercise] = useState({ exercise_id: '', sets: '', reps: '', rest: '' });
     const [savedPlans, setSavedPlans] = useState([]);
     const [planName, setPlanName] = useState('');
     const [isPlanNameSet, setIsPlanNameSet] = useState(false);
     const [daysOfWeek, setDaysOfWeek] = useState([]);
     const [exerciseOptions, setExerciseOptions] = useState([]);
 
-    // Helper function to fetch API data with Authorization header
     const fetchWithAuth = async (url, options = {}) => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -28,20 +27,16 @@ const Training = () => {
         return response.json();
     };
 
-    // Fetch days, exercises, and saved plans when component mounts
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
                 const daysData = await fetchWithAuth("http://gym-app.test/api/days");
-                console.log("Loaded days data:", daysData);
                 setDaysOfWeek(daysData.data.map(day => day.name));
 
                 const exercisesData = await fetchWithAuth("http://gym-app.test/api/exercises");
-                console.log("Loaded exercises data:", exercisesData);
-                setExerciseOptions(exercisesData.map(exercise => exercise.name));
+                setExerciseOptions(exercisesData);
 
                 const savedPlansData = await fetchWithAuth("http://gym-app.test/api/user-workout-plans");
-                console.log("Loaded saved plans data:", savedPlansData);
                 setSavedPlans(savedPlansData.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -75,26 +70,24 @@ const Training = () => {
             console.error("Error deleting plan:", error);
         }
     };
+
     const selectDay = (day) => {
         setSelectedDay(day);
         setStep(2);
     };
 
     const handleExerciseChange = (e) => {
-        setCurrentExercise({ ...currentExercise, [e.target.name]: e.target.value });
-    };
-
-    const handlePlanNameChange = (e) => {
-        setPlanName(e.target.value);
+        const { name, value } = e.target;
+        setCurrentExercise({ ...currentExercise, [name]: value });
     };
 
     const addExercise = () => {
-        if (currentExercise.exercise && currentExercise.sets && currentExercise.reps && currentExercise.rest) {
+        if (currentExercise.exercise_id && currentExercise.sets && currentExercise.reps && currentExercise.rest) {
             setTrainingPlan((prev) => ({
                 ...prev,
                 [selectedDay]: [...(prev[selectedDay] || []), currentExercise],
             }));
-            setCurrentExercise({ exercise: '', sets: '', reps: '', rest: '' });
+            setCurrentExercise({ exercise_id: '', sets: '', reps: '', rest: '' });
             setStep(1);
         }
     };
@@ -107,7 +100,7 @@ const Training = () => {
                     plan: Object.entries(trainingPlan).map(([day, exercises]) => ({
                         day_of_week: daysOfWeek.indexOf(day) + 1,
                         exercises: exercises.map(exercise => ({
-                            exercise_id: exercise.exercise_id || 1,  // Możliwe ID domyślne, dostosowane do rzeczywistości
+                            exercise_id: parseInt(exercise.exercise_id),
                             sets: parseInt(exercise.sets),
                             reps: parseInt(exercise.reps),
                             break: parseInt(exercise.rest),
@@ -126,20 +119,11 @@ const Training = () => {
 
                 if (response.status === 200) {
                     console.log("Plan saved successfully:", response);
-                    const newPlan = {
-                        name: planName,
-                        plan: Object.entries(trainingPlan).map(([day, exercises]) => ({
-                            day,
-                            exercises: exercises.map(ex => ({
-                                name: ex.exercise,
-                                sets: ex.sets,
-                                reps: ex.reps,
-                                break: ex.rest,
-                            }))
-                        }))
-                    };
 
-                    setSavedPlans((prevPlans) => [...prevPlans, newPlan]);
+                    // Fetch updated saved plans to refresh the list
+                    const updatedPlansData = await fetchWithAuth("http://gym-app.test/api/user-workout-plans");
+                    setSavedPlans(updatedPlansData.data);
+
                     setTrainingPlan({});
                     setPlanName('');
                     setStep(1);
@@ -163,14 +147,11 @@ const Training = () => {
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-5xl font-bold mb-6 text-center text-gray-900">Kreator Planu Treningowego</h1>
-
-            {/* Komponent wyświetlający zapisane plany treningowe */}
             {exerciseOptions.length > 0 ? (
                 <SavedTrainingPlans plans={savedPlans} onDelete={deletePlan} exerciseOptions={exerciseOptions}/>
             ) : (
                 <div>Ładowanie danych ćwiczeń...</div>
             )}
-
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
                 <div className="col-span-1">
                     <DaySelectionTraining
@@ -179,7 +160,6 @@ const Training = () => {
                         selectDay={selectDay}
                     />
                 </div>
-
                 <div className="col-span-3">
                     {!isPlanNameSet && (
                         <div className="mb-6">
@@ -187,7 +167,7 @@ const Training = () => {
                             <input
                                 type="text"
                                 value={planName}
-                                onChange={handlePlanNameChange}
+                                onChange={(e) => setPlanName(e.target.value)}
                                 placeholder="Wprowadź nazwę planu"
                                 className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
@@ -199,7 +179,6 @@ const Training = () => {
                             </button>
                         </div>
                     )}
-
                     {isPlanNameSet && step === 2 && (
                         <TrainingForm
                             currentExercise={currentExercise}
@@ -210,11 +189,9 @@ const Training = () => {
                             exerciseOptions={exerciseOptions}
                         />
                     )}
-
                     {isPlanNameSet && (
                         <>
-                            <TrainingSummary daysOfWeek={daysOfWeek} trainingPlan={trainingPlan} />
-
+                            <TrainingSummary daysOfWeek={daysOfWeek} trainingPlan={trainingPlan} exerciseOptions={exerciseOptions} />
                             <div className="flex justify-center mt-10">
                                 <button
                                     onClick={savePlan}

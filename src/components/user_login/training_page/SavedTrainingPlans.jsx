@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const SavedTrainingPlans = ({ plans, exerciseOptions, onDelete }) => {
     const [expandedPlan, setExpandedPlan] = useState(null);
@@ -8,8 +8,12 @@ const SavedTrainingPlans = ({ plans, exerciseOptions, onDelete }) => {
         setExpandedPlan(expandedPlan === index ? null : index);
     };
 
-    const getExerciseName = (exerciseName) => {
-        return exerciseOptions.includes(exerciseName) ? exerciseName : 'Nieznane ćwiczenie';
+    const getExerciseNameByName = (exerciseName) => {
+        console.log('Received exerciseName:', exerciseName);
+        console.log('Exercise options:', exerciseOptions);
+        const exercise = exerciseOptions.find(ex => ex.name === exerciseName);
+        console.log('Matched exercise:', exercise);
+        return exercise ? exercise.name : 'Nieznane ćwiczenie';
     };
 
     const confirmDelete = (planId) => {
@@ -54,11 +58,14 @@ const SavedTrainingPlans = ({ plans, exerciseOptions, onDelete }) => {
                                 <div key={i} className="mb-4">
                                     <h4 className="font-semibold">{dayPlan.day}</h4>
                                     <ul className="list-disc list-inside">
-                                        {dayPlan.exercises.map((exercise, j) => (
-                                            <li key={j}>
-                                                {getExerciseName(exercise.name)} - Waga: {exercise.weight}, Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Przerwa: {exercise.break || exercise.rest}
-                                            </li>
-                                        ))}
+                                        {dayPlan.exercises.map((exercise, j) => {
+                                            console.log('Exercise data:', exercise);
+                                            return (
+                                                <li key={j}>
+                                                    {getExerciseNameByName(exercise.name)} - Waga: {exercise.weight}, Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Przerwa: {exercise.break || exercise.rest}
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 </div>
                             ))}

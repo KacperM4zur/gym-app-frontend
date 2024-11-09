@@ -1,6 +1,11 @@
 import React from 'react';
 
-const TrainingSummary = ({ daysOfWeek, trainingPlan }) => {
+const TrainingSummary = ({ daysOfWeek, trainingPlan, exerciseOptions }) => {
+    const getExerciseNameById = (id) => {
+        const exercise = exerciseOptions.find((option) => option.id === parseInt(id));
+        return exercise ? exercise.name : 'Nieznane ćwiczenie';
+    };
+
     return (
         <div className="mt-8">
             <h2 className="text-3xl font-bold mb-6 text-center">Podsumowanie Planu Treningowego</h2>
@@ -12,7 +17,7 @@ const TrainingSummary = ({ daysOfWeek, trainingPlan }) => {
                             {trainingPlan[day] ? (
                                 trainingPlan[day].map((exercise, index) => (
                                     <li key={index} className="mb-2">
-                                        <span className="font-semibold">{exercise.exercise}</span> - Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Przerwa: {exercise.rest}
+                                        <span className="font-semibold">{getExerciseNameById(exercise.exercise_id)}</span> - Serie: {exercise.sets}, Powtórzenia: {exercise.reps}, Waga: {exercise.weight} Przerwa: {exercise.rest}
                                     </li>
                                 ))
                             ) : (
